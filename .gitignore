@@ -1,2 +1,3 @@
 /sim_to_exp/controlnet_essential/control_sd15_ini.ckpt
 /sim_to_exp/controlnet_essential/v1-5-pruned.ckpt
+/seed_to_sim1_sim2_deterministic/non_essential
