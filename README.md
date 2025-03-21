@@ -10,12 +10,15 @@ The code is divided into three folders
 
 In the current version of the paper these three folder correspond to the following tasks-
 1) **Pre-trained Stable Diffusion VAE for image compression and training NN on the compressed latent embeddings**
+
 We use this pipeline to demonstrate orders of magnitude acceleration using emulated NN models. We use dilated ResNets inspired from [PDEarena](https://github.com/pdearena/pdearena?tab=readme-ov-file), Stable Diffusion v1-4 Autoencoder from [Huggingface Diffusers Library](https://huggingface.co/CompVis/stable-diffusion-v1-4). This pipeline is used to demonstrate prediction of simulation end-points from initial seeds and also to test the data demand for the second part by testing mapping between two simulated conditions. 
 
 2) **ControlNet attached to Stable Diffusion for spatial conditioning the U-Net on images of patterns**
+
 We use this pipeline to demonstrate generative pattern prediction of experiments that have been conditioned on simulations. Major part of the code for ControlNet is borrowed from [here](https://github.com/lllyasviel/ControlNet), with additional modifications being made for preprocessing images and inference pipeline. This pipeline is used to demonstrate probablisitic prediction of experiment end-point patterns by conditioning on simulated end-point patterns. Current version uses the pre-trained v1-5 Stable Diffusion.  
 
 3) **MATLAB codes for generation of simulation end-point pattern pairs**
+
 Contains the details of generating simulations with varying end-point patterns with parallel processing using CPUs for generating a large number of patterns. Code is modified from Nan Luo's MSB 2021 [Paper](https://www.embopress.org/doi/full/10.15252/msb.202010089) [Code](https://github.com/youlab/OptimalPatterns_NanLuo) 
 
 ### Details of code files inside each folder:
