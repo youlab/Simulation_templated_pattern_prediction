@@ -44,14 +44,14 @@ yaml_config     = "./models/cldm_v15.yaml"  # YAML config file
 # Inference parameters
 prompt          = ""        # blank prompt (or set as desired)
 a_prompt        = ""        # additional prompt (if any)
-n_prompt        = ""        # negative prompt (if any)
-num_samples     = 3         # generate multiple samples per image
+n_prompt        = "longbody, lowres, bad anatomy, cropped, worst quality, low quality"  # negative prompt (if any)
+num_samples     = 2         # generate multiple samples per image
 image_resolution= 256       # resolution for resizing input image
 ddim_steps      = 50       # number of DDIM sampling steps
-scale           = 9.0       # guidance scale
+scale           = 15.1       # guidance scale
 seed_value      = 729397049        # -1 means random seed
 eta             = 0.0       # DDIM eta
-guess_mode      = True     # set to True if you want guess mode behavior
+guess_mode      = False     # set to True if you want guess mode behavior
 strength        = 1.0       # control strength used in magic scaling
 
 # ------------------------------
@@ -88,7 +88,6 @@ for i, (batch, img_path) in enumerate(dataloader):
             # input_img is expected to be in (C, H, W) and in float [0,1]
             input_img = input_img.cpu().numpy()         # shape: (C, H, W)
             # print(input_img.shape)
-
             if input_img.ndim == 4 and input_img.shape[0] == 1:
                 input_img = input_img[0]
 

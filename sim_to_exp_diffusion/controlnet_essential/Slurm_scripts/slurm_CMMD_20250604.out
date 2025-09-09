@@ -1,0 +1,25 @@
+Running exp_vs_sim: /hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3_png/ vs /hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_v3_png/
+CMMD (exp_vs_sim) = [2025-09-05 12:27:44,009] [INFO] [real_accelerator.py:110:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+Calculating embeddings for 96 images from /hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3_png/.
+Calculating embeddings for 96 images from /hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_v3_png/.
+The CMMD value is:  3.844
+Running exp_vs_pred: /hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3_png/ vs /hpc/dctrl/ks723/inference/Generated_202552_327_simtoexp_v3/
+CMMD (exp_vs_pred) = [2025-09-05 12:29:45,583] [INFO] [real_accelerator.py:110:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+Calculating embeddings for 96 images from /hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3_png/.
+Calculating embeddings for 96 images from /hpc/dctrl/ks723/inference/Generated_202552_327_simtoexp_v3/.
+The CMMD value is:  0.490
+Running exp_test_vs_exp_train: /hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3_png/ vs /hpc/group/youlab/ks723/storage/Exp_images/Final_folder_uniform_fixedseed_preprocess_png/
+CMMD (exp_test_vs_exp_train) = [2025-09-05 12:30:37,325] [INFO] [real_accelerator.py:110:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+Calculating embeddings for 96 images from /hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3_png/.
+Calculating embeddings for 409 images from /hpc/group/youlab/ks723/storage/Exp_images/Final_folder_uniform_fixedseed_preprocess_png/.
+The CMMD value is:  0.136
+Running exp_vs_pred_seed: /hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3_png/ vs /hpc/dctrl/ks723/inference/v2025821_156_seedtoexp_v3/
+CMMD (exp_vs_pred_seed) = [2025-09-05 12:31:27,952] [INFO] [real_accelerator.py:110:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+Calculating embeddings for 96 images from /hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3_png/.
+Calculating embeddings for 96 images from /hpc/dctrl/ks723/inference/v2025821_156_seedtoexp_v3/.
+The CMMD value is:  0.885
+Running sim_vs_pred: /hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_v3_png/ vs /hpc/dctrl/ks723/inference/Generated_202552_327_simtoexp_v3/
+CMMD (sim_vs_pred) = [2025-09-05 12:31:47,443] [INFO] [real_accelerator.py:110:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+Calculating embeddings for 96 images from /hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_v3_png/.
+Calculating embeddings for 96 images from /hpc/dctrl/ks723/inference/Generated_202552_327_simtoexp_v3/.
+The CMMD value is:  4.442

@@ -1,0 +1,80 @@
+# pipeline.py
+import os
+import random 
+import cv2
+import numpy as np
+import torch 
+import einops
+from omegaconf import OmegaConf
+from pytorch_lightning import seed_everything
+from cldm.cldm      import ControlLDM
+from cldm.ddim_hacked import DDIMSampler
+from annotator.util import resize_image, HWC3
+import config
+
+# determinism, seed, CUBLAS etc. all here, at module top
+os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark   = False
+torch.use_deterministic_algorithms(True)
+
+yaml_config = "./models/cldm_v15.yaml"           # YAML configuration file
+# ckpt_path = '/hpc/dctrl/ks723/Huggingface_repos/ControlNet_repo/controlnet_repo/lightning_logs/version_25484631/checkpoints/epoch=4-step=51124.ckpt'
+ckpt_path='/hpc/dctrl/ks723/Huggingface_repos/ControlNet_repo/controlnet_repo/lightning_logs/version_34134787/checkpoints/epoch=4-step=51124.ckpt'  # simtoexp
+# ------------------------------
+# 1. Load the Model from Checkpoint
+# ------------------------------
+config_yaml = OmegaConf.load(yaml_config)
+params = OmegaConf.to_container(config_yaml.model.params, resolve=True)
+model = ControlLDM.load_from_checkpoint(ckpt_path, **params)
+
+
+
+
+model = model.cuda()
+
+# Set up the DDIM sampler.
+ddim_sampler = DDIMSampler(model)
+
+def process(input_image, prompt, a_prompt, n_prompt, num_samples, image_resolution, ddim_steps, guess_mode, strength, scale, seed, eta):
+    with torch.no_grad():
+        img = resize_image(HWC3(input_image), image_resolution)
+        H, W, C = img.shape
+
+        print(type(img))
+        # detected_map = np.zeros_like(img, dtype=np.uint8)
+        # detected_map[np.min(img, axis=2) < 127] = 255
+
+        control = torch.from_numpy(img.copy()).float().cuda() / 255.0
+        control = torch.stack([control for _ in range(num_samples)], dim=0)
+        control = einops.rearrange(control, 'b h w c -> b c h w').clone()
+
+        if seed == -1:
+            seed = random.randint(0, 65535)
+        seed_everything(seed)
+
+        if config.save_memory:
+            model.low_vram_shift(is_diffusing=False)
+
+        cond = {"c_concat": [control], "c_crossattn": [model.get_learned_conditioning([prompt + ', ' + a_prompt] * num_samples)]}
+        un_cond = {"c_concat": None if guess_mode else [control], "c_crossattn": [model.get_learned_conditioning([n_prompt] * num_samples)]}
+        shape = (4, H // 8, W // 8)
+
+        if config.save_memory:
+            model.low_vram_shift(is_diffusing=True)
+
+        model.control_scales = [strength * (0.825 ** float(12 - i)) for i in range(13)] if guess_mode else ([strength] * 13)  # Magic number. IDK why. Perhaps because 0.825**12<0.01 but 0.826**12>0.01
+        samples, intermediates = ddim_sampler.sample(ddim_steps, num_samples,
+                                                     shape, cond, verbose=False, eta=eta,
+                                                     unconditional_guidance_scale=scale,
+                                                     unconditional_conditioning=un_cond)
+
+        if config.save_memory:
+            model.low_vram_shift(is_diffusing=False)
+
+        x_samples = model.decode_first_stage(samples)
+        x_samples = (einops.rearrange(x_samples, 'b c h w -> b h w c') * 127.5 + 127.5).cpu().numpy().clip(0, 255).astype(np.uint8)
+
+        results = [x_samples[i] for i in range(num_samples)]
+    return results
+
