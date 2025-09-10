@@ -3,5 +3,7 @@
 /seed_to_sim1_sim2_deterministic/non_essential
 /sim_to_exp_diffusion/controlnet_essential/extra
 /sim_to_exp_diffusion/controlnet_essential/inference_simtoexp_BnW.py
+/sim_to_exp_diffusion/controlnet_essential/inference_simtoexp.py # now using batch_infer.py file
 /sim_to_exp_diffusion/controlnet_essential/simtoexp_BnW_dataset.py
 /sim_to_exp_diffusion/controlnet_essential/simtoexp_BnW_train.py
+/sim_to_exp_diffusion/controlnet_essential/Display_finalresults_inference.ipynb  # now using plot_Fig5.ipynb file

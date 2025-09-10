@@ -2,7 +2,7 @@ from PIL import Image
 import numpy as np
 import cv2
 
-
+# the following functions preprocess a single image.
 
 def preprocess_experimental(exp_path, top_crop=30, bottom_crop=30, left_crop=31, right_crop=30,
                                      img_length=256, img_width=256):
@@ -116,7 +116,7 @@ def preprocess_seed(sim_path, top_crop=0, bottom_crop=0, left_crop=0, right_crop
 def preprocess_experimental_fromscratch(exp_path, top_crop=30, bottom_crop=30, left_crop=31, right_crop=30,
                                      img_length=256, img_width=256):
     """
-    Preprocess a single image from the given path and return a PIL-compatible output.
+    Preprocess image from raw experimental data. 
     
     Parameters:
         exp_path (str): Path to the experimental image file.
@@ -128,7 +128,7 @@ def preprocess_experimental_fromscratch(exp_path, top_crop=30, bottom_crop=30, l
         img_width (int): Desired output image width.
         
     Returns:
-        PIL.Image: Processed image in PIL format.
+        PIL.Image: BnW and Cropped image of Experimental data.
     """
     # Read image using cv2
     img_array = cv2.imread(exp_path)
@@ -195,6 +195,15 @@ def preprocess_vanillaresize(sim_path, img_length=256, img_width=256):
 
 def preprocess_experimental_initialstage(img_path, img_length=256,img_width=256):
 
+    """
+    Preprocess single image in color from rw experimental data.
+
+    Accepts: Input image path, raw experimental data 
+
+    Returns: PIL.Image: Color and Cropped image of Experimental data. Cropped exterior is a black masked circle. 
+
+    """
+
     img = cv2.imread(img_path)
 
     # Convert the image to grayscale
@@ -245,11 +254,46 @@ def preprocess_experimental_initialstage(img_path, img_length=256,img_width=256)
             # img_array_i=th3
 
 
-            img_masked_resized=cv2.resize(img_masked_rgb,(img_length,img_width))
+            # resize both the adjusted image and the mask
+            img_resized = cv2.resize(img_masked_rgb, (img_length, img_width))
+            mask_resized = cv2.resize(mask,(img_length, img_width),interpolation=cv2.INTER_NEAREST)
+
+            # re-mask the resized image to force a black border outside the circle
+            img_masked_resized = cv2.bitwise_and(img_resized,img_resized,mask=mask_resized)
             return img_masked_resized
     else:
         print("No circles were found")
         return None
+
+def preprocess_inference_thresholded (img_path, img_length=256,img_width=256):
+    """
+    Preprocess single image in color from inference folder
+
+    Accepts: Input image path, color plate boundary cropped from the inference folder.
+
+    Returns: PIL.Image: Thresholded image of Experimental data
+
+    """
+
+    img = cv2.imread(img_path)
+
+    # Convert the image to grayscale
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Apply Gaussian blur to the grayscale image
+    blur = cv2.GaussianBlur(img_gray, (5, 5), 0)
+
+    # Apply binary thresholding to the blurred image
+    _, img_thresh = cv2.threshold(blur, 110, 255, cv2.THRESH_BINARY)
+
+    # Resize the thresholded image
+    img_resized = cv2.resize(img_thresh, (img_length, img_width))
+
+    return img_resized
+
+
+
+
 
 
 
