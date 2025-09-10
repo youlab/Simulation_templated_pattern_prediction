@@ -38,19 +38,24 @@ Contains the details of generating simulations with varying end-point patterns w
 
 2) ***sim_to_exp_diffusion***
 
+
 - *annotator*, *ldm*, *models* subfolders are unchanged from the original ControlNet code
 - *cldm* contains two new scripts logger_custom.py and preprocess.py for adding custom saving of images from trained models and preprocessing simulation or experimental images respectively
 - *Slurm_scripts* subfolder contains the slurm scripts for execution of python files in DCC
 - `config.py` and `share.py` are unchanged from original implementation
 - `tool_add_control.py` , `tool_add_control_sd21` and `tool_transfer_control.py` are also unchanged, and are required for adding ControlNet to Stable Diffusion- details of how to do this are explained later. 
+- `create_promptjson.ipynb` is the script for creating a json file that has the information about source and target image pairs and the blank text prompt, used in training of ControlNet. 
 - `simtoexp_dataset.py` creates the dataset for mapping from simulation to processed color images of experimental patterns
-- `simtoexp_train.py` Training using the above dataset using the v1-5 Stable Diffusion + ControlNet 
+- `simtoexp_train.py` Training using the above dataset using the v1-5 Stable Diffusion + ControlNet
+- `ControlNet_traininggrid_SimtoExp_SuppFig16.ipynb` is the script that outputs a pdf, showing the training process of the ControlNet pipeline on training/validation dataset. **Supp Fig 16**
 - `batch_infer.py` Inference using the above trained model
-- Similar as the orientation of the above 3 files, `seedtoexp_dataset.py`, `seedtoexp_train.py` and `batch_infer_seedtoexp.py` are files for creating dataset, training and inference for predicting the experimental images starting from the initial seeds instead of the simulations as a baseline estimate. 
 - `plot_Fig5.ipynb` contains the display script for displaying the orignal seed, predicted image using the trained ControlNet and the ground truth experiments for Simulation to Experiment mapping. **Fig 5**
-- `inference_gradio.ipynb` is the gradio web interface for mapping from simulations to experimental patterns.  
+- Similar as the orientation of the `simtpexp_dataset.py`, `simtoexp_train.py` and `batch_infer.py` files, `seedtoexp_dataset.py`, `seedtoexp_train.py` and `batch_infer_seedtoexp.py` are the files for creating dataset, training and inference for predicting the experimental images starting from the initial seeds instead of the simulations as a baseline estimate. To create the augmentation dataset which has the input seed configurations rotated corresponding to the experiments we have the file `Seed_DataAugmentation.py`. **Supp Fig 17**
+- `batch_infer_ablation.py` and `batch_infer_seedsweep.py` are the scripts that show how the inference depends on some controllable parameters, like negative prompt, positive prompt etc and also the intial starting random seeding configuration.  **Supp Fig 18 and Supp Fig 20**
+- `inference_gradio.ipynb` is the gradio web interface for mapping from simulations to experimental patterns.   
+- `inference_quantmetrics_seedtoexp.ipynb` and `inference_quantmetrics_simtoexp.ipynb` are scripts for computing the various image comparision metrics between simulations, experiments and diffusion model predictions. **Supp Table 1**
 - `image_to_seed.py`, `vae_util.py`,`predict_util.py` ,`models.py` and `prediction_seedtosim.py` are the scripts for getting an image-> convert to a seeding configuration-> use the saved dilResNet model and predict the simulated patterns. We want to integrate this with the gradio pipeline so a web interface would allow the user to run both the parts of my pipeline- 1) seed to simulation and 2) simulation to experiment. 
-- `inference_gradio_start_to_end.ipynb` is the notebook for running the gradio from start(seed) to end (predicted experimental patterns)- currently still under construction, facing OOM issues on DCC.
+- `inference_gradio_start_to_end.ipynb` is the notebook for running the gradio from start(seed) to end (predicted experimental patterns)- currently still under construction, facing OOM issues on DCC. 
 
 3) ***sim_generation***
 (Still under construction- original files, not well commented)
