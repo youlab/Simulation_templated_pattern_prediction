@@ -12,6 +12,17 @@ from cldm.ddim_hacked import DDIMSampler
 from annotator.util import resize_image, HWC3
 import config
 
+
+# import argparse
+# # argument parsing, passing the folder name
+# parser = argparse.ArgumentParser()
+# parser.add_argument('--specific_folder', type=str, default='simtoexp', help='specific folder from the trained model saved locations')
+# args = parser.parse_args()
+# specific_folder=args.specific_folder
+
+
+
+
 # determinism, seed, CUBLAS etc. all here, at module top
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 torch.backends.cudnn.deterministic = True
@@ -20,23 +31,32 @@ torch.use_deterministic_algorithms(True)
 
 yaml_config = "./models/cldm_v15.yaml"           # YAML configuration file
 # ckpt_path = '/hpc/dctrl/ks723/Huggingface_repos/ControlNet_repo/controlnet_repo/lightning_logs/version_25484631/checkpoints/epoch=4-step=51124.ckpt'
-ckpt_path='/hpc/dctrl/ks723/Huggingface_repos/ControlNet_repo/controlnet_repo/lightning_logs/version_25478850/checkpoints/epoch=4-step=51124.ckpt'  # simtoexp
+# ckpt_path='/hpc/dctrl/ks723/Huggingface_repos/ControlNet_repo/controlnet_repo/lightning_logs/version_25478850/checkpoints/epoch=4-step=51124.ckpt'  # simtoexp 31 Jan 2025
+# ckpt_path= '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/lightning_logs/version_37312560/checkpoints/epoch=4-step=51124.ckpt' # simtoexp 26 Sep 2025
+# ckpt_path= '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/checkpoints/epoch-epoch=04.ckpt' # simtoexp 14 Oct 2025
+
+
 # ------------------------------
 # 1. Load the Model from Checkpoint
 # ------------------------------
-config_yaml = OmegaConf.load(yaml_config)
-params = OmegaConf.to_container(config_yaml.model.params, resolve=True)
-model = ControlLDM.load_from_checkpoint(ckpt_path, **params)
+# config_yaml = OmegaConf.load(yaml_config)
+# params = OmegaConf.to_container(config_yaml.model.params, resolve=True)
+# model = ControlLDM.load_from_checkpoint(ckpt_path, **params)
+# model = model.cuda()
+
+# # Set up the DDIM sampler.
+# ddim_sampler = DDIMSampler(model)
+
+def build(specific_folder: str):
+    ckpt_path = f"/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/lightning_logs/{specific_folder}/checkpoints/epoch=4-step=51124.ckpt"
+    config_yaml = OmegaConf.load(yaml_config)
+    params = OmegaConf.to_container(config_yaml.model.params, resolve=True)
+    model = ControlLDM.load_from_checkpoint(ckpt_path, **params).cuda()
+    ddim_sampler = DDIMSampler(model)
+    return model, ddim_sampler
 
 
-
-
-model = model.cuda()
-
-# Set up the DDIM sampler.
-ddim_sampler = DDIMSampler(model)
-
-def process(input_image, prompt, a_prompt, n_prompt, num_samples, image_resolution, ddim_steps, guess_mode, strength, scale, seed, eta):
+def process(model, ddim_sampler, input_image, prompt, a_prompt, n_prompt, num_samples, image_resolution, ddim_steps, guess_mode, strength, scale, seed, eta):
     with torch.no_grad():
         img = resize_image(HWC3(input_image), image_resolution)
         H, W, C = img.shape
@@ -65,9 +85,9 @@ def process(input_image, prompt, a_prompt, n_prompt, num_samples, image_resoluti
 
         model.control_scales = [strength * (0.825 ** float(12 - i)) for i in range(13)] if guess_mode else ([strength] * 13)  # Magic number. IDK why. Perhaps because 0.825**12<0.01 but 0.826**12>0.01
         samples, intermediates = ddim_sampler.sample(ddim_steps, num_samples,
-                                                     shape, cond, verbose=False, eta=eta,
-                                                     unconditional_guidance_scale=scale,
-                                                     unconditional_conditioning=un_cond)
+                                                    shape, cond, verbose=False, eta=eta,
+                                                    unconditional_guidance_scale=scale,
+                                                    unconditional_conditioning=un_cond)
 
         if config.save_memory:
             model.low_vram_shift(is_diffusing=False)
@@ -77,4 +97,5 @@ def process(input_image, prompt, a_prompt, n_prompt, num_samples, image_resoluti
 
         results = [x_samples[i] for i in range(num_samples)]
     return results
+   
 

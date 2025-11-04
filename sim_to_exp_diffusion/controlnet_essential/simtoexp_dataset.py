@@ -4,6 +4,7 @@ import numpy as np
 import os
 
 from torch.utils.data import Dataset
+from cldm.preprocess import preprocess_experimental_backgroundwhite,preprocess_simulation_graybackground
 
 base_folder='/hpc/group/youlab/ks723/storage'
 base_folder_i='/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Selected_v4_ALL_100AUG'
@@ -27,16 +28,18 @@ class MyDataset(Dataset):
         target_filename = item['target']
         prompt = item['prompt']
 
-        source = cv2.imread(os.path.join(base_folder_i,source_filename))
-        target = cv2.imread(os.path.join(base_folder_o,target_filename))
+        source_path = os.path.join(base_folder_i,source_filename)
+        target_path = os.path.join(base_folder_o,target_filename)
 
-        # Do not forget that OpenCV read images in BGR order.
-        source = cv2.cvtColor(source, cv2.COLOR_BGR2RGB)
-        target = cv2.cvtColor(target, cv2.COLOR_BGR2RGB)
+        source = preprocess_simulation_graybackground(source_path)
+        target = preprocess_experimental_backgroundwhite(target_path)
 
-        source = cv2.resize(source, (256, 256))  # resizing for efficient downsampling by U-Net in steps of 8
-        target = cv2.resize(target, (256, 256))
 
+        # Converting to 3 channels for simulation images
+        source = np.repeat(source[:, :, np.newaxis] , 3, axis=2) 
+
+        # already resized to 256x256 for efficient downsampling by U-Net in steps of 8
+    
         # Normalize source images to [0, 1].
         source = source.astype(np.float32) / 255.0
 

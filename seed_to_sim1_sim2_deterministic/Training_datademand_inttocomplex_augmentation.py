@@ -2,7 +2,7 @@ import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader
 import numpy as np
 from diffusers import AutoencoderKL
 import pickle
@@ -11,48 +11,34 @@ from datetime import datetime
 import time
 
 
-taskID=int(os.environ['SLURM_ARRAY_TASK_ID'])
-size_array=np.array([10,20,40,60,80,100,200,400,800,1600])
-end_pattern= size_array[taskID-1]
+from models.dilResNet import PDEArenaDilatedResNet
 
-folder_latent_intermediate= f'/hpc/group/youlab/ks723/miniconda3/Lingchong/Latents/latent_dim_AugmentedDataDemand_4channels_4x32x32_{end_pattern}_intermediate_820.pickle'
-folder_latent_complex= f'/hpc/group/youlab/ks723/miniconda3/Lingchong/Latents/latent_dim_AugmentedDataDemand_4channels_4x32x32_{end_pattern}_complex_820.pickle'
+from utils.config import MODEL_SAVE_LOCATION,LOGS_SAVE_LOCATION
+from utils.config import LATENT_OUTPUT_BASE
 
-vae = AutoencoderKL.from_pretrained("CompVis/stable-diffusion-v1-4", subfolder="vae")
+# taskID=int(os.environ['SLURM_ARRAY_TASK_ID'])
+# size_array=np.array([10,20,40,60,80,100,200,400,800,1600])
+# end_pattern= size_array[taskID-1]
 
+# modification since 800 got a device that did not have a gpu
 
-def encode_img(input_img):
-    input_img = input_img.repeat(3, 1, 1)
-    
-    # Single image -> single latent in a batch (so size 1, 4, 64, 64)
-    if len(input_img.shape)<4:
-        input_img = input_img.unsqueeze(0)
-    with torch.no_grad():
-        latent = vae.encode(input_img*2 - 1) # Note scaling  # to make outputs from -1 to 1 
-    return 0.18215 * latent.latent_dist.sample()
+end_pattern=np.array(800)
 
+currentDay = datetime.now().day
+currentMonth = datetime.now().month
 
+LATENT_INTERMEDIATE_FILE= f'{LATENT_OUTPUT_BASE}/latent_dim_AugmentedDataDemand_4channels_4x32x32_{end_pattern}_intermediate_926.pickle'
+LATENT_COMPLEX_FILE= f'{LATENT_OUTPUT_BASE}/latent_dim_AugmentedDataDemand_4channels_4x32x32_{end_pattern}_complex_926.pickle'
 
-def decode_img(latents):
-    # bath of latents -> list of images
-    latents = (1 / 0.18215) * latents
-    with torch.no_grad():
-        image = vae.decode(latents).sample
-    image = (image / 2 + 0.5).clamp(0, 1)    # to make outputs from 0 to 1 
-    image = image.detach()
-    return image
+NAME =f"dilRESNET_DataAugmentation_intermediatetocomplex_{end_pattern}_v{currentMonth}{currentDay}-{int(time.time())}"  # change this later to incorporate exact date 
+BATCH_SIZE = 64
 
-
-
-#MODIFIED PICKLES ON 021024 TO NEW PATTERNS LATENTS
-
-
-
-pickle_in=open(folder_latent_intermediate,"rb")
+#MODIFIED PICKLES ON 093025 TO NEW GRAY PATTERN LATENTS
+pickle_in=open(LATENT_INTERMEDIATE_FILE,"rb")
 yprime_in=pickle.load(pickle_in)
 
 
-pickle_in_output=open(folder_latent_complex,"rb")
+pickle_in_output=open(LATENT_COMPLEX_FILE,"rb")
 yprime_in_output=pickle.load(pickle_in_output)
 
 yprime_in=torch.Tensor(yprime_in)
@@ -66,73 +52,30 @@ yprime_scaled_in_output=yprime_in_output
 yprime_scaled_in=yprime_scaled_in.float()
 yprime_scaled_in_output=yprime_scaled_in_output.float()
 
+
+print(f"Loaded input samples shape: {yprime_scaled_in.shape}")
+print(f"Loaded output samples shape: {yprime_scaled_in_output.shape}")
+
 # Define train and test datasets
 dataset = torch.utils.data.TensorDataset(yprime_scaled_in, yprime_scaled_in_output)
 
-# Split dataset into train and validation sets
+# Split dataset into train and validation sets (simple index-based split)
 train_size = int(0.9 * len(dataset))
-val_size = len(dataset) - train_size
-train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
-batch_size=64
-train_loader=DataLoader(train_dataset,batch_size=batch_size,shuffle=True)
-test_loader=DataLoader(val_dataset,batch_size=batch_size,shuffle=False)
+# Direct tensor slicing for simple index-based split
+# note this is done to avoid random_split shuffling which can lead to data leakage due to augmentation
+train_inputs = yprime_scaled_in[:train_size]
+train_outputs = yprime_scaled_in_output[:train_size]
+val_inputs = yprime_scaled_in[train_size:]
+val_outputs = yprime_scaled_in_output[train_size:]
+
+# Create train and validation datasets
+train_dataset = torch.utils.data.TensorDataset(train_inputs, train_outputs)
+val_dataset = torch.utils.data.TensorDataset(val_inputs, val_outputs)
 
 
-# Dilated Basic Block similar to PDEArena
-class PDEArenaDilatedBlock(nn.Module):
-    def __init__(self, in_planes, out_planes, dilation_rates, activation=nn.ReLU, norm=True):
-        super(PDEArenaDilatedBlock, self).__init__()
-
-        # Create dilated convolution layers with specified dilation rates
-        self.dilated_layers = nn.ModuleList([
-            nn.Conv2d(
-                in_planes if i == 0 else out_planes, 
-                out_planes, 
-                kernel_size=3, 
-                padding=rate, 
-                dilation=rate, 
-                bias=False
-            )
-            for i, rate in enumerate(dilation_rates)
-        ])
-        
-        # Normalization and Activation layers
-        self.norm_layers = nn.ModuleList([nn.BatchNorm2d(out_planes) if norm else nn.Identity() for _ in dilation_rates])
-        self.activation = activation(inplace=True)
-
-        # Shortcut (1x1 convolution if input and output planes differ)
-        self.shortcut = nn.Sequential()
-        if in_planes != out_planes:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(in_planes, out_planes, kernel_size=1, bias=False),
-                nn.BatchNorm2d(out_planes) if norm else nn.Identity()
-            )
-
-    def forward(self, x):
-        out = x
-        for layer, norm in zip(self.dilated_layers, self.norm_layers):
-            out = self.activation(norm(layer(out)))
-        return out + self.shortcut(x)  # Residual connection
-
-# Dilated ResNet with Adjustable Layers and Blocks
-class PDEArenaDilatedResNet(nn.Module):
-    def __init__(self, in_channels, out_channels, hidden_channels=64, num_blocks=15, dilation_rates=[1, 2, 4, 8], activation=nn.ReLU, norm=True):
-        super(PDEArenaDilatedResNet, self).__init__()
-        
-        self.in_conv = nn.Conv2d(in_channels, hidden_channels, kernel_size=3, padding=1)  # Input layer
-        
-        # Stack of dilated blocks
-        self.layers = nn.Sequential(
-            *[PDEArenaDilatedBlock(hidden_channels, hidden_channels, dilation_rates, activation=activation, norm=norm) for _ in range(num_blocks)]
-        )
-        
-        self.out_conv = nn.Conv2d(hidden_channels, out_channels, kernel_size=3, padding=1)  # Output layer
-
-    def forward(self, x):
-        x = self.in_conv(x)
-        x = self.layers(x)
-        return self.out_conv(x)
+train_loader=DataLoader(train_dataset,batch_size=BATCH_SIZE,shuffle=True)
+test_loader=DataLoader(val_dataset,batch_size=BATCH_SIZE,shuffle=False)
 
 # Example usage
 model = PDEArenaDilatedResNet(
@@ -149,16 +92,6 @@ model = PDEArenaDilatedResNet(
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-
-currentSecond= datetime.now().second
-currentMinute = datetime.now().minute
-currentHour = datetime.now().hour
-
-currentDay = datetime.now().day
-currentMonth = datetime.now().month
-currentYear = datetime.now().year
-
-NAME =f"dilRESNET_DataAugmentation_intermediatetocomplex_{end_pattern}_v{currentMonth}{currentDay}-{int(time.time())}"  # change this later to incorporate exact date 
 
 num_epochs = 500      
 warmup_epochs=10
@@ -179,13 +112,21 @@ scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=gamma)
 
 # Training parameters and early stopping initialization
 
+print("Starting training...")
+
+# Training parameters and early stopping initialization # to save best epoch
 best_loss = float('inf')
+tolerant_loss= None
+best_epoch=0
 epochs_without_improvement = 0
 patience = 70
 train_losses=[]
 test_losses=[]
 saved_model_epoch=0
 delta=0.05
+train_delta=0.01
+best_train_for_tolerant = float('inf')  # NEW
+tolerant_epoch=None
 
 
 for epoch in range(num_epochs):
@@ -235,18 +176,24 @@ for epoch in range(num_epochs):
         print(f"Epoch [{epoch + 1}/{num_epochs}] Train Loss: {avg_train_loss:.6f} | Test Loss: {avg_test_loss:.6f} | lr: {param_group['lr']:0.7f}")
 
     # Early stopping logic with tolerance
-    if avg_val_loss < best_loss - delta:
+    if avg_val_loss < best_loss :  # remove delta for strict improvement
         # Significant improvement
         best_loss = avg_val_loss
         epochs_without_improvement = 0
-        print(f"Epoch {epoch + 1}: Significant improvement observed. Best Validation Loss updated to {best_loss:.6f}.")
-        # save the best model weights
-        torch.save(model.state_dict(), f'/hpc/group/youlab/ks723/miniconda3/saved_models/trained/{NAME}_best.pt') 
+        best_epoch = epoch
+        best_train_for_tolerant = avg_train_loss  # reset anchor
+        torch.save(model.state_dict(), f'{MODEL_SAVE_LOCATION}/{NAME}_best.pt')
+        print(f"Epoch {epoch + 1}: New BEST (val): {best_loss:.6f}")
 
-    elif avg_val_loss <= best_loss + delta:
+    elif (avg_val_loss <= best_loss + delta) and (avg_train_loss < best_train_for_tolerant - train_delta):
         # Within tolerance
         epochs_without_improvement = 0
-        print(f"Epoch {epoch + 1}: Validation loss increased but within tolerance ({delta}). Continuing training.")
+        best_train_for_tolerant = avg_train_loss
+        tolerant_loss=avg_val_loss
+        torch.save(model.state_dict(), f'{MODEL_SAVE_LOCATION}/{NAME}_best_tolerant.pt')
+        tolerant_epoch=epoch +1
+        print(f"Epoch {epoch + 1}: Saved tolerant best (val {avg_val_loss:.6f} within {delta}, "
+                f"train improved by ≥{train_delta}).")
     else:
         # Exceeded tolerance
         epochs_without_improvement += 1
@@ -256,17 +203,25 @@ for epoch in range(num_epochs):
             print(f"Early stopping at epoch {epoch + 1} due to no improvement after {patience} epochs.")
             break
 
-# MODIFIED LINE BELOW ON 021024 TO THE NEW PATTERNS SET
 
-torch.save(model.state_dict(), f'/hpc/group/youlab/ks723/miniconda3/saved_models/trained/{NAME}.pt') 
+
+torch.save(model.state_dict(), f'{MODEL_SAVE_LOCATION}/{NAME}.pt')
 
 # Save losses and model details in a JSON file at the end of training
 losses = {
     'train_losses': train_losses,
     'test_losses': test_losses,
-    'best_loss': best_loss
+    'best_loss': best_loss,
+    'tolerant_loss': tolerant_loss,
+    'best_epoch': best_epoch + 1,
+    'tolerant_epoch': tolerant_epoch
 }
 
-with open(f'/hpc/group/youlab/ks723/miniconda3/saved_models/logs/losses_{NAME}.json', 'w') as f:
+with open(f'{LOGS_SAVE_LOCATION}/losses_{NAME}.json', 'w') as f:
     json.dump(losses, f, indent=4)
 
+print(f"Training complete. Best Validation Loss: {best_loss:.6f} at epoch {best_epoch + 1}. Model saved as {MODEL_SAVE_LOCATION}/{NAME}.pt")
+if tolerant_epoch is not None:
+    print(f"Tolerant best model at epoch {tolerant_epoch} saved as {MODEL_SAVE_LOCATION}/{NAME}_best_tolerant.pt")
+else:
+    print("No tolerant-best model was saved.")

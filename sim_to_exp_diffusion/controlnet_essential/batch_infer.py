@@ -1,7 +1,15 @@
 import os, glob, cv2
-from pipeline import process
+import pipeline
 from datetime import datetime
 import time
+from cldm.preprocess import preprocess_simulation_graybackground
+import argparse
+
+
+p = argparse.ArgumentParser()
+p.add_argument('--specific_folder', type=str, default='simtoexp')
+args = p.parse_args()
+model, sampler = pipeline.build(args.specific_folder)
 
 # ------------------------------
 # Set up output folder using current date/time
@@ -15,7 +23,7 @@ currentYear   = datetime.now().year
 
 task_inference='simtoexp'
 
-OUTPUT_DIR = f"/hpc/dctrl/ks723/inference/v{currentYear}{currentMonth}{currentDay}_{currentHour}{currentMinute}_{task_inference}"
+OUTPUT_DIR = f"/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v{currentYear}{currentMonth}{currentDay}_{currentHour}{currentMinute}_{task_inference}"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # ------------------------------
@@ -56,10 +64,13 @@ for fp in sorted(glob.glob(os.path.join(INPUT_DIR, "*.TIF"))):
 # ------------------------------
 for prefix, fp in prefix_map.items():
     # load & convert to H×W×C RGB
-    img = cv2.cvtColor(cv2.imread(fp), cv2.COLOR_BGR2RGB)
+    # img = cv2.cvtColor(cv2.imread(fp), cv2.COLOR_BGR2RGB)
+
+    # process images with the simulation preprocessing step
+    img= preprocess_simulation_graybackground(fp)
 
     # run the shared pipeline
-    outs = process(img, **ARGS)
+    outs = pipeline.process(model, sampler, img, **ARGS)
 
     # save as prefix_1.png … prefix_5.png
     for i, out in enumerate(outs, start=1):

@@ -1,6 +1,6 @@
 #!/bin/bash 
-#SBATCH -o slurm_CMMD_20250604.out
-#SBATCH -e slurm_CMMD_20250604.err
+#SBATCH -o slurm_CMMD_20251011.out
+#SBATCH -e slurm_CMMD_20251011.err
 #SBATCH -p youlab-gpu
 #SBATCH --exclusive
 #SBATCH --mem=24G
@@ -9,11 +9,11 @@ source activate pytorch_PA_patternprediction
 cd /hpc/dctrl/ks723/cmmd
 # Folder pairs
 declare -A comparisons
-comparisons["exp_vs_sim"]=" /hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3_png/ /hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_v3_png/"
-comparisons["exp_vs_pred"]="/hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3_png/ /hpc/dctrl/ks723/inference/Generated_202552_327_simtoexp_v3/"
-comparisons["sim_vs_pred"]="/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_v3_png/ /hpc/dctrl/ks723/inference/Generated_202552_327_simtoexp_v3/"
-comparisons["exp_test_vs_exp_train"]=" /hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3_png/ /hpc/group/youlab/ks723/storage/Exp_images/Final_folder_uniform_fixedseed_preprocess_png/"
-comparisons["exp_vs_pred_seed"]=" /hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3_png/ /hpc/dctrl/ks723/inference/v2025821_156_seedtoexp_v3/"
+comparisons["exp_vs_sim"]=" /hpc/group/youlab/ks723/storage/Processed_testsets/exp /hpc/group/youlab/ks723/storage/Processed_testsets/sim"
+comparisons["exp_vs_pred"]="/hpc/group/youlab/ks723/storage/Processed_testsets/exp /hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v2025926_1251_simtoexp_v3/"
+comparisons["sim_vs_pred"]="/hpc/group/youlab/ks723/storage/Processed_testsets/sim /hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v2025926_1251_simtoexp_v3/"
+# comparisons["exp_test_vs_exp_train"]=" /hpc/group/youlab/ks723/storage/Processed_testsets/exp /hpc/group/youlab/ks723/storage/Exp_images/Final_folder_uniform_fixedseed_preprocess_png/"
+comparisons["exp_vs_pred_seed"]=" /hpc/group/youlab/ks723/storage/Processed_testsets/exp /hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251011_841_seedtoexp_swapped_v3/"
 
 
 # Loop and run

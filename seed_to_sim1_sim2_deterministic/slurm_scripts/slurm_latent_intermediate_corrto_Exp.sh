@@ -1,10 +1,15 @@
 #!/bin/bash 
-#SBATCH -o slurm_latent_SimcorrtoExp.out
-#SBATCH -e slurm_latent_SimcorrtoExp.err
+#SBATCH -J latent_gray_SimcorrtoExp
+#SBATCH -o ../slurm_oe/%x_%j.out
+#SBATCH -e ../slurm_oe/%x_%j.err
 #SBATCH -p youlab-gpu,scavenger-gpu,gpu-common
 #SBATCH --exclusive
-#SBATCH --mem=100G
+#SBATCH --mem=32G
 #SBATCH --mail-type=ALL
-source activate test_pytorch_ipy
-cd /hpc/group/youlab/ks723/miniconda3/Lingchong/Latent_generation
-python latent_from_SimcorrtoExp_images.py
+
+set -euo pipefail
+source activate pytorch_PA_patternprediction
+cd /hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/seed_to_sim1_sim2_deterministic
+export PYTHONPATH="${PYTHONPATH:-}:$(pwd)"
+python latent_generation/latent_from_SimcorrtoExp_images.py
+

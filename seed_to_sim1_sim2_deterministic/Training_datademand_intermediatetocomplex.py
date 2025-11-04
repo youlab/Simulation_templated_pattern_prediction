@@ -4,11 +4,16 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, random_split
 import numpy as np
-from diffusers import AutoencoderKL
+
 import pickle
 import json 
 from datetime import datetime
 import time
+
+from models.dilResNet import PDEArenaDilatedResNet
+
+from utils.config import MODEL_SAVE_LOCATION,LOGS_SAVE_LOCATION
+from utils.config import LATENT_OUTPUT_SAVED, LATENT_OUTPUT_TDB_SAVED
 
 
 taskID=int(os.environ['SLURM_ARRAY_TASK_ID'])
@@ -16,40 +21,21 @@ size_array=np.array([100,200,400,800,1600,3200,6400,12800,30000])
 end_index = size_array[taskID-1]
 
 
-vae = AutoencoderKL.from_pretrained("CompVis/stable-diffusion-v1-4", subfolder="vae")
 
+currentDay = datetime.now().day
+currentMonth = datetime.now().month
 
-def encode_img(input_img):
-    input_img = input_img.repeat(3, 1, 1)
-    
-    # Single image -> single latent in a batch (so size 1, 4, 64, 64)
-    if len(input_img.shape)<4:
-        input_img = input_img.unsqueeze(0)
-    with torch.no_grad():
-        latent = vae.encode(input_img*2 - 1) # Note scaling  # to make outputs from -1 to 1 
-    return 0.18215 * latent.latent_dist.sample()
+BATCH_SIZE=64 # after looking at nvtop
+NAME =f"Pixel_32x32x4to32x32x4_dilRESNET_graypatterns_intermediatetocomplex_{end_index}_v{currentMonth}{currentDay}-{int(time.time())}"  # change this later to incorporate exact date 
 
-
-
-def decode_img(latents):
-    # bath of latents -> list of images
-    latents = (1 / 0.18215) * latents
-    with torch.no_grad():
-        image = vae.decode(latents).sample
-    image = (image / 2 + 0.5).clamp(0, 1)    # to make outputs from 0 to 1 
-    image = image.detach()
-    return image
-
-
-file_location_latent='/hpc/group/youlab/ks723/miniconda3/Lingchong/Latents/'
 #MODIFIED PICKLES ON 021024 TO NEW PATTERNS LATENTS
 
-pickle_in=open(os.path.join(file_location_latent,"latent_dim_75000_4channels_4x32x32_newintermediate102.pickle"),"rb")
+pickle_in=open(LATENT_OUTPUT_SAVED,"rb")
 yprime_in=pickle.load(pickle_in)
 yprime_in=yprime_in[:end_index,:,:,:]
 
 
-pickle_in_output=open(os.path.join(file_location_latent,"latent_dim_75000_4channels_4x32x32_newcomplex102.pickle"),"rb")
+pickle_in_output=open(LATENT_OUTPUT_TDB_SAVED,"rb")
 yprime_in_output=pickle.load(pickle_in_output)
 yprime_in_output=yprime_in_output[:end_index,:,:,:]
 
@@ -73,65 +59,8 @@ train_size = int(0.9 * len(dataset))
 val_size = len(dataset) - train_size
 train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
-batch_size=64
-train_loader=DataLoader(train_dataset,batch_size=batch_size,shuffle=True)
-test_loader=DataLoader(val_dataset,batch_size=batch_size,shuffle=False)
-
-
-# Dilated Basic Block similar to PDEArena
-class PDEArenaDilatedBlock(nn.Module):
-    def __init__(self, in_planes, out_planes, dilation_rates, activation=nn.ReLU, norm=True):
-        super(PDEArenaDilatedBlock, self).__init__()
-
-        # Create dilated convolution layers with specified dilation rates
-        self.dilated_layers = nn.ModuleList([
-            nn.Conv2d(
-                in_planes if i == 0 else out_planes, 
-                out_planes, 
-                kernel_size=3, 
-                padding=rate, 
-                dilation=rate, 
-                bias=False
-            )
-            for i, rate in enumerate(dilation_rates)
-        ])
-        
-        # Normalization and Activation layers
-        self.norm_layers = nn.ModuleList([nn.BatchNorm2d(out_planes) if norm else nn.Identity() for _ in dilation_rates])
-        self.activation = activation(inplace=True)
-
-        # Shortcut (1x1 convolution if input and output planes differ)
-        self.shortcut = nn.Sequential()
-        if in_planes != out_planes:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(in_planes, out_planes, kernel_size=1, bias=False),
-                nn.BatchNorm2d(out_planes) if norm else nn.Identity()
-            )
-
-    def forward(self, x):
-        out = x
-        for layer, norm in zip(self.dilated_layers, self.norm_layers):
-            out = self.activation(norm(layer(out)))
-        return out + self.shortcut(x)  # Residual connection
-
-# Dilated ResNet with Adjustable Layers and Blocks
-class PDEArenaDilatedResNet(nn.Module):
-    def __init__(self, in_channels, out_channels, hidden_channels=64, num_blocks=15, dilation_rates=[1, 2, 4, 8], activation=nn.ReLU, norm=True):
-        super(PDEArenaDilatedResNet, self).__init__()
-        
-        self.in_conv = nn.Conv2d(in_channels, hidden_channels, kernel_size=3, padding=1)  # Input layer
-        
-        # Stack of dilated blocks
-        self.layers = nn.Sequential(
-            *[PDEArenaDilatedBlock(hidden_channels, hidden_channels, dilation_rates, activation=activation, norm=norm) for _ in range(num_blocks)]
-        )
-        
-        self.out_conv = nn.Conv2d(hidden_channels, out_channels, kernel_size=3, padding=1)  # Output layer
-
-    def forward(self, x):
-        x = self.in_conv(x)
-        x = self.layers(x)
-        return self.out_conv(x)
+train_loader=DataLoader(train_dataset,batch_size=BATCH_SIZE,shuffle=True)
+test_loader=DataLoader(val_dataset,batch_size=BATCH_SIZE,shuffle=False)
 
 # Example usage
 model = PDEArenaDilatedResNet(
@@ -149,17 +78,10 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-currentSecond= datetime.now().second
-currentMinute = datetime.now().minute
-currentHour = datetime.now().hour
-
-currentDay = datetime.now().day
-currentMonth = datetime.now().month
-currentYear = datetime.now().year
 
 
 
-num_epochs = 1000       
+num_epochs = 500       
 warmup_epochs=10
 lr = 5e-4               #for fine tuning.
 min_lr = 5e-6
@@ -176,15 +98,21 @@ criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=gamma)
 
-# Training parameters and early stopping initialization
+print("Starting training...")
 
+# Training parameters and early stopping initialization # to save best epoch
 best_loss = float('inf')
+tolerant_loss= None
+best_epoch=0
 epochs_without_improvement = 0
 patience = 70
 train_losses=[]
 test_losses=[]
 saved_model_epoch=0
 delta=0.05
+train_delta=0.01
+best_train_for_tolerant = float('inf')  # NEW
+tolerant_epoch=None
 
 
 for epoch in range(num_epochs):
@@ -234,15 +162,24 @@ for epoch in range(num_epochs):
         print(f"Epoch [{epoch + 1}/{num_epochs}] Train Loss: {avg_train_loss:.6f} | Test Loss: {avg_test_loss:.6f} | lr: {param_group['lr']:0.7f}")
 
     # Early stopping logic with tolerance
-    if avg_val_loss < best_loss - delta:
+    if avg_val_loss < best_loss :  # remove delta for strict improvement
         # Significant improvement
         best_loss = avg_val_loss
         epochs_without_improvement = 0
-        print(f"Epoch {epoch + 1}: Significant improvement observed. Best Validation Loss updated to {best_loss:.6f}.")
-    elif avg_val_loss <= best_loss + delta:
+        best_epoch = epoch
+        best_train_for_tolerant = avg_train_loss  # reset anchor
+        torch.save(model.state_dict(), f'{MODEL_SAVE_LOCATION}/{NAME}_best.pt')
+        print(f"Epoch {epoch + 1}: New BEST (val): {best_loss:.6f}")
+
+    elif (avg_val_loss <= best_loss + delta) and (avg_train_loss < best_train_for_tolerant - train_delta):
         # Within tolerance
         epochs_without_improvement = 0
-        print(f"Epoch {epoch + 1}: Validation loss increased but within tolerance ({delta}). Continuing training.")
+        best_train_for_tolerant = avg_train_loss
+        tolerant_loss=avg_val_loss
+        torch.save(model.state_dict(), f'{MODEL_SAVE_LOCATION}/{NAME}_best_tolerant.pt')
+        tolerant_epoch=epoch +1
+        print(f"Epoch {epoch + 1}: Saved tolerant best (val {avg_val_loss:.6f} within {delta}, "
+                f"train improved by ≥{train_delta}).")
     else:
         # Exceeded tolerance
         epochs_without_improvement += 1
@@ -252,17 +189,25 @@ for epoch in range(num_epochs):
             print(f"Early stopping at epoch {epoch + 1} due to no improvement after {patience} epochs.")
             break
 
-# MODIFIED LINE BELOW ON 021024 TO THE NEW PATTERNS SET
-NAME =f"Pixel_32x32x3to32x32x4_dilRESNET_newpatterns_intermediatetocomplex_{end_index}_Test_Model_v{currentMonth}{currentDay}_Cluster_GPU_tfData-{int(time.time())}"  # change this later to incorporate exact date 
-torch.save(model.state_dict(), f'/hpc/group/youlab/ks723/miniconda3/saved_models/trained/{NAME}.pt') 
+
+
+torch.save(model.state_dict(), f'{MODEL_SAVE_LOCATION}/{NAME}.pt')
 
 # Save losses and model details in a JSON file at the end of training
 losses = {
     'train_losses': train_losses,
     'test_losses': test_losses,
-    'best_loss': best_loss
+    'best_loss': best_loss,
+    'tolerant_loss': tolerant_loss,
+    'best_epoch': best_epoch + 1,
+    'tolerant_epoch': tolerant_epoch
 }
 
-with open(f'/hpc/group/youlab/ks723/miniconda3/saved_models/logs/losses_{NAME}.json', 'w') as f:
+with open(f'{LOGS_SAVE_LOCATION}/losses_{NAME}.json', 'w') as f:
     json.dump(losses, f, indent=4)
 
+print(f"Training complete. Best Validation Loss: {best_loss:.6f} at epoch {best_epoch + 1}. Model saved as {MODEL_SAVE_LOCATION}/{NAME}.pt")
+if tolerant_epoch is not None:
+    print(f"Tolerant best model at epoch {tolerant_epoch} saved as {MODEL_SAVE_LOCATION}/{NAME}_best_tolerant.pt")
+else:
+    print("No tolerant-best model was saved.")

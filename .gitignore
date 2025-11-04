@@ -1,9 +1,16 @@
 /sim_to_exp_diffusion/controlnet_essential/control_sd15_ini.ckpt
 /sim_to_exp_diffusion/controlnet_essential/v1-5-pruned.ckpt
 /seed_to_sim1_sim2_deterministic/non_essential
+/seed_to_sim1_sim2_deterministic/slurm_scripts/slurm_oe
+/seed_to_sim1_sim2_deterministic/slurm_oe
 /sim_to_exp_diffusion/controlnet_essential/extra
-/sim_to_exp_diffusion/controlnet_essential/inference_simtoexp_BnW.py
-/sim_to_exp_diffusion/controlnet_essential/inference_simtoexp.py # now using batch_infer.py file
-/sim_to_exp_diffusion/controlnet_essential/simtoexp_BnW_dataset.py
-/sim_to_exp_diffusion/controlnet_essential/simtoexp_BnW_train.py
-/sim_to_exp_diffusion/controlnet_essential/Display_finalresults_inference.ipynb  # now using plot_Fig5.ipynb file
+/sim_to_exp_diffusion/controlnet_essential/checkpoints
+/sim_to_exp_diffusion/controlnet_essential/controlnet_seedtoexp_controlnet_seedtoexp
+/sim_to_exp_diffusion/controlnet_essential/csv_logs
+/sim_to_exp_diffusion/controlnet_essential/eval_fixed
+/sim_to_exp_diffusion/controlnet_essential/image_logs
+/sim_to_exp_diffusion/controlnet_essential/inference
+/sim_to_exp_diffusion/controlnet_essential/lightning_logs
+/sim_to_exp_diffusion/controlnet_essential/Slurm_scripts/slurm_oe
+/sim_to_exp_diffusion/controlnet_essential/tb_logs
+/sim_to_exp_diffusion/controlnet_essential/Misc.ipynb

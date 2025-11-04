@@ -3,6 +3,10 @@ import os
 import numpy as np
 import cv2
 
+from utils.config import SIMULATION_TEST_OUTPUT_FOLDER_2, SIMULATION_TEST_OUTPUT_FOLDER_TDB_2
+from utils.config import SIMULATION_AUGMENTATION_BASE, SIMULATION_AUGMENTATION_BASE_TDB
+
+
 # Make folders for diferent data sizes with augmentation, total to 30k samples each
 # unique number of samples before augmentation: 100,200,400, 800,1600
 
@@ -51,10 +55,10 @@ data_sizes= 40000
 augmentation_perimage= [int(data_sizes/x) for x in unique_samples]
 
 
-simulation_folder_1 = '/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_050924/Sim_input/intermediate/Tp3'
-simulation_folder_2= '/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_050924/Sim_input/complex/Tp3'
-new_simulation_folder_1_base= '/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_050924/Data_augmentation_datademand_20250819_intermediate_Tp3'
-new_simulation_folder_2_base= '/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_050924/Data_augmentation_datademand_20250819_complex_Tp3'
+simulation_folder_1 = SIMULATION_TEST_OUTPUT_FOLDER_2
+simulation_folder_2= SIMULATION_TEST_OUTPUT_FOLDER_TDB_2
+new_simulation_folder_1_base= SIMULATION_AUGMENTATION_BASE
+new_simulation_folder_2_base= SIMULATION_AUGMENTATION_BASE_TDB
 
 # Ensure the new folder exists
 os.makedirs(new_simulation_folder_1_base, exist_ok=True)

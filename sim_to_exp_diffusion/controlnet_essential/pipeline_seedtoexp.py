@@ -20,7 +20,7 @@ torch.use_deterministic_algorithms(True)
 
 yaml_config = "./models/cldm_v15.yaml"           # YAML configuration file
 # ckpt_path = '/hpc/dctrl/ks723/Huggingface_repos/ControlNet_repo/controlnet_repo/lightning_logs/version_25484631/checkpoints/epoch=4-step=51124.ckpt'
-ckpt_path='/hpc/dctrl/ks723/Huggingface_repos/ControlNet_repo/controlnet_repo/lightning_logs/version_34134787/checkpoints/epoch=4-step=51124.ckpt'  # simtoexp
+ckpt_path='/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/lightning_logs/version_37726282/checkpoints/epoch=4-step=51124.ckpt'  # simtoexp
 # ------------------------------
 # 1. Load the Model from Checkpoint
 # ------------------------------

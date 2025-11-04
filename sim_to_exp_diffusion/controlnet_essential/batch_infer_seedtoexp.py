@@ -2,6 +2,7 @@ import os, glob, cv2
 from pipeline_seedtoexp import process
 from datetime import datetime
 import time
+from cldm.preprocess import preprocess_seed_graybackground
 
 # ------------------------------
 # Set up output folder using current date/time
@@ -15,7 +16,7 @@ currentYear   = datetime.now().year
 
 task_inference='seedtoexp'
 
-OUTPUT_DIR = f"/hpc/dctrl/ks723/inference/v{currentYear}{currentMonth}{currentDay}_{currentHour}{currentMinute}_{task_inference}"
+OUTPUT_DIR = f"/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v{currentYear}{currentMonth}{currentDay}_{currentHour}{currentMinute}_{task_inference}"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
@@ -60,9 +61,14 @@ for fp in sorted(glob.glob(os.path.join(INPUT_DIR, "*.png"))):
 # ------------------------------
 for prefix, fp in prefix_map.items():
     # load & convert to H×W×C RGB
-    img = cv2.cvtColor(cv2.imread(fp), cv2.COLOR_BGR2RGB)
-    img=  cv2.resize(img, (256, 256))  # resize to match model input size
+    # img = cv2.cvtColor(cv2.imread(fp), cv2.COLOR_BGR2RGB)
+    # img=  cv2.resize(img, (256, 256))  # resize to match model input size
 
+
+    # process images with the seed preprocessing step
+    img= preprocess_seed_graybackground(fp, top_crop=0,bottom_crop=0,left_crop=3,right_crop=2)
+    img=  cv2.resize(img, (256, 256))  # resize to match model input size
+   
     # run the shared pipeline
     outs = process(img, **ARGS)
 
