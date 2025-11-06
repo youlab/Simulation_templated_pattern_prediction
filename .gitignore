@@ -14,3 +14,4 @@
 /sim_to_exp_diffusion/controlnet_essential/Slurm_scripts/slurm_oe
 /sim_to_exp_diffusion/controlnet_essential/tb_logs
 /sim_to_exp_diffusion/controlnet_essential/Misc.ipynb
+Dataset_upload.ipynb
