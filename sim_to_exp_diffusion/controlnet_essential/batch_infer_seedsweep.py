@@ -4,6 +4,7 @@ import random
 from pipeline import process
 from datetime import datetime
 from cldm.preprocess import preprocess_simulation_graybackground
+from cldm.config import SIM_FOLDER_TEST, OUTPUT_DIR_RANDOMSEEDSWEEP
 
 
 currentMinute = datetime.now().minute
@@ -13,11 +14,10 @@ currentMonth  = datetime.now().month
 currentYear   = datetime.now().year
 
 
-
 # ─── Configuration ─────────────────────────────────────────────────────────────
 
 # Path to the one image 
-INPUT_DIR='/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set/'
+INPUT_DIR=SIM_FOLDER_TEST
 INPUT_IMAGE_PATH = os.path.join(INPUT_DIR, "196_1.TIF")  
 # preprocess the input image to get numpy array
 preprocessed_array = preprocess_simulation_graybackground(INPUT_IMAGE_PATH)
@@ -25,11 +25,8 @@ if preprocessed_array is None:
     raise FileNotFoundError(f"Failed to preprocess {INPUT_IMAGE_PATH}")
 
 
-
-
-
 # Output folder (will be created if needed)
-OUTPUT_DIR = f"/hpc/dctrl/ks723/inference/v{currentYear}{currentMonth}{currentDay}_{currentHour}{currentMinute}_random_seed_sweep/"
+OUTPUT_DIR = OUTPUT_DIR_RANDOMSEEDSWEEP
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # How many random seeds to try
@@ -62,7 +59,7 @@ else:
 
 # ─── Sweep 100 random seeds ────────────────────────────────────────────────────
 
-# (Optionally fix the RNG so you get the same 100 seeds each run)
+# (Optionally fix the RNG so we get the same 100 seeds each run)
 random.seed(42)
 for _ in range(NUM_SEEDS):
     seed = random.randint(0, 2**31 - 1)

@@ -6,9 +6,10 @@ import pipeline
 from datetime import datetime
 from cldm.preprocess import preprocess_simulation_graybackground
 import argparse
+from cldm.config import SIM_FOLDER_TEST, OUTPUT_DIR_ABLATION_BASE
 
 p = argparse.ArgumentParser()
-p.add_argument('--specific_folder', type=str, default='simtoexp')
+
 
 currentMinute = datetime.now().minute
 currentHour   = datetime.now().hour
@@ -17,7 +18,7 @@ currentMonth  = datetime.now().month
 currentYear   = datetime.now().year
 
 p.add_argument("--input-dir",
-                default="/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set",
+                default=SIM_FOLDER_TEST,
                 help="Folder of test images")
 p.add_argument("--task", required=True,
                 help="specific folder suffix to save results")
@@ -30,19 +31,19 @@ p.add_argument(
     action=argparse.BooleanOptionalAction,
     default=False,
     help="Enable or disable guess mode"
-    )
+    )   # specify guess mode if needed, if not given default is False
 p.add_argument("--strength",      type=float, default=1.0)
 p.add_argument("--scale",         type=float, default=15.1)
 p.add_argument("--eta",           type=float, default=0.0)
 p.add_argument("--a-prompt",      type=str,   default="")
-p.add_argument("--n-prompt",      type=str,
+p.add_argument("--n-prompt",     type=str,
                 default="longbody, lowres, bad anatomy, cropped, worst quality, low quality")
 args = p.parse_args()
 
-model, sampler = pipeline.build(args.specific_folder)
+
 
 # inference base folder
-output_dir=f"/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v{currentYear}{currentMonth}{currentDay}_{currentHour}{currentMinute}_{args.task}"
+output_dir=OUTPUT_DIR_ABLATION_BASE + f"_{args.task}"
 os.makedirs(output_dir, exist_ok=True)
 
 ARGS = {
@@ -70,7 +71,7 @@ for fp in sorted(glob.glob(os.path.join(args.input_dir, "*.TIF"))):
 for prefix, fp in prefix_map.items():
 
     img = preprocess_simulation_graybackground(fp)
-    outs = pipeline.process(model, sampler, img, **ARGS)
+    outs = pipeline.process(img, **ARGS)
     for i, out in enumerate(outs, start=1):
         fn = f"{prefix}_{i}.png"
         cv2.imwrite(

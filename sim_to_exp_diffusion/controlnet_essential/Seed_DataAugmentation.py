@@ -2,7 +2,7 @@
 import os
 import numpy as np
 import cv2
-
+from cldm.config import SEED_FOLDER_TRAIN_NONAUG, EXP_FOLDER_TRAIN_NONAUG, SPECIFIC_FOLDER_SEED
 
 # Now augment for the seed folder
 
@@ -61,10 +61,9 @@ def process_simulation_image(img, angle):
 augmentation_perimage= 100
 
 
-seed_folder = '/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Selected_v4_ALL_input/'
-experiment_folder_justchecking= '/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Selected_v4_ALL'
-new_seed_folder= '/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Selected_v4_ALL_input_100AUG'
-
+seed_folder = SEED_FOLDER_TRAIN_NONAUG
+experiment_folder_justchecking= EXP_FOLDER_TRAIN_NONAUG
+new_seed_folder= SPECIFIC_FOLDER_SEED
 
 # Ensure the new folder exists
 os.makedirs(new_seed_folder, exist_ok=True)

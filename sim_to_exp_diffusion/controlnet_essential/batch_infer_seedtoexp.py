@@ -3,6 +3,7 @@ from pipeline_seedtoexp import process
 from datetime import datetime
 import time
 from cldm.preprocess import preprocess_seed_graybackground
+from cldm.config import OUTPUT_DIR_SEEDTOEXP, SEED_FOLDER_TEST
 
 # ------------------------------
 # Set up output folder using current date/time
@@ -14,17 +15,12 @@ currentDay    = datetime.now().day
 currentMonth  = datetime.now().month
 currentYear   = datetime.now().year
 
-task_inference='seedtoexp'
-
-OUTPUT_DIR = f"/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v{currentYear}{currentMonth}{currentDay}_{currentHour}{currentMinute}_{task_inference}"
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-
+OUTPUT_DIR = OUTPUT_DIR_SEEDTOEXP
 
 # ------------------------------
 # Parameters and File Paths (update these as needed)
 # ------------------------------
-INPUT_DIR      = "/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_input"  # test images folder
+INPUT_DIR      = SEED_FOLDER_TEST  # test images folder
 
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)

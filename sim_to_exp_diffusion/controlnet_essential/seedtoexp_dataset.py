@@ -5,11 +5,11 @@ import os
 
 from torch.utils.data import Dataset
 from cldm.preprocess import preprocess_experimental_backgroundwhite,preprocess_seed_graybackground
+from cldm.config import BASE_FOLDER, SPECIFIC_FOLDER_SEED, SPECIFIC_FOLDER_EXP
 
-base_folder='/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524'
-
-base_folder_o='/hpc/group/youlab/ks723/storage/Exp_images/Final_folder_uniform_fixedseed_100AUG'
-base_folder_i="/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Selected_v4_ALL_input_100AUG"
+base_folder=BASE_FOLDER
+base_folder_o=SPECIFIC_FOLDER_EXP
+base_folder_i=SPECIFIC_FOLDER_SEED
 
 
 class MyDataset(Dataset):

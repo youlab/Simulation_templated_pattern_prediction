@@ -1,6 +1,6 @@
 #!/bin/bash 
-#SBATCH -o slurm_batch_infer_seedsweep_20251001.out
-#SBATCH -e slurm_batch_infer_seedsweep_20251001.err
+#SBATCH -o slurm_batch_infer_seedsweep_20251111.out
+#SBATCH -e slurm_batch_infer_seedsweep_20251111.err
 #SBATCH -p youlab-gpu
 #SBATCH --exclusive
 #SBATCH --mem=24G

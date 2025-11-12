@@ -11,8 +11,10 @@ from cldm.cldm      import ControlLDM
 from cldm.ddim_hacked import DDIMSampler
 from annotator.util import resize_image, HWC3
 import config
+from cldm.config import CKPT_PATH
 
 
+######### ARG PARSE STUFF WHEN USING PARALLEL JOBS IGNORE FOR NOW #####
 # import argparse
 # # argument parsing, passing the folder name
 # parser = argparse.ArgumentParser()
@@ -21,6 +23,15 @@ import config
 # specific_folder=args.specific_folder
 
 
+# def build(specific_folder: str):
+#     ckpt_path = CKPT_PATH
+#     config_yaml = OmegaConf.load(yaml_config)
+#     params = OmegaConf.to_container(config_yaml.model.params, resolve=True)
+#     model = ControlLDM.load_from_checkpoint(ckpt_path, **params).cuda()
+#     ddim_sampler = DDIMSampler(model)
+#     return model, ddim_sampler
+
+##########################################################################
 
 
 # determinism, seed, CUBLAS etc. all here, at module top
@@ -30,33 +41,19 @@ torch.backends.cudnn.benchmark   = False
 torch.use_deterministic_algorithms(True)
 
 yaml_config = "./models/cldm_v15.yaml"           # YAML configuration file
-# ckpt_path = '/hpc/dctrl/ks723/Huggingface_repos/ControlNet_repo/controlnet_repo/lightning_logs/version_25484631/checkpoints/epoch=4-step=51124.ckpt'
-# ckpt_path='/hpc/dctrl/ks723/Huggingface_repos/ControlNet_repo/controlnet_repo/lightning_logs/version_25478850/checkpoints/epoch=4-step=51124.ckpt'  # simtoexp 31 Jan 2025
-# ckpt_path= '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/lightning_logs/version_37312560/checkpoints/epoch=4-step=51124.ckpt' # simtoexp 26 Sep 2025
-# ckpt_path= '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/checkpoints/epoch-epoch=04.ckpt' # simtoexp 14 Oct 2025
-
 
 # ------------------------------
 # 1. Load the Model from Checkpoint
 # ------------------------------
-# config_yaml = OmegaConf.load(yaml_config)
-# params = OmegaConf.to_container(config_yaml.model.params, resolve=True)
-# model = ControlLDM.load_from_checkpoint(ckpt_path, **params)
-# model = model.cuda()
-
-# # Set up the DDIM sampler.
-# ddim_sampler = DDIMSampler(model)
-
-def build(specific_folder: str):
-    ckpt_path = f"/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/lightning_logs/{specific_folder}/checkpoints/epoch=4-step=51124.ckpt"
-    config_yaml = OmegaConf.load(yaml_config)
-    params = OmegaConf.to_container(config_yaml.model.params, resolve=True)
-    model = ControlLDM.load_from_checkpoint(ckpt_path, **params).cuda()
-    ddim_sampler = DDIMSampler(model)
-    return model, ddim_sampler
 
 
-def process(model, ddim_sampler, input_image, prompt, a_prompt, n_prompt, num_samples, image_resolution, ddim_steps, guess_mode, strength, scale, seed, eta):
+config_yaml = OmegaConf.load(yaml_config)
+params = OmegaConf.to_container(config_yaml.model.params, resolve=True)
+model = ControlLDM.load_from_checkpoint(CKPT_PATH, **params).cuda()
+ddim_sampler = DDIMSampler(model)
+
+
+def process(input_image, prompt, a_prompt, n_prompt, num_samples, image_resolution, ddim_steps, guess_mode, strength, scale, seed, eta):
     with torch.no_grad():
         img = resize_image(HWC3(input_image), image_resolution)
         H, W, C = img.shape

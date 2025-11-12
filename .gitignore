@@ -15,3 +15,8 @@
 /sim_to_exp_diffusion/controlnet_essential/tb_logs
 /sim_to_exp_diffusion/controlnet_essential/Misc.ipynb
 Dataset_upload.ipynb
+Readme_hfdataset.md
+/sim_to_exp_diffusion/controlnet_essential/inference_folders.tar
+/sim_to_exp_diffusion/controlnet_essential/inference_images.tar
+/sim_to_exp_diffusion/controlnet_essential/nohup.out
+

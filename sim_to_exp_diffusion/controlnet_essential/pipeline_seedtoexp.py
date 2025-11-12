@@ -11,6 +11,7 @@ from cldm.cldm      import ControlLDM
 from cldm.ddim_hacked import DDIMSampler
 from annotator.util import resize_image, HWC3
 import config
+from cldm.config import CKPT_PATH_SEEDTOEXP
 
 # determinism, seed, CUBLAS etc. all here, at module top
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
@@ -19,17 +20,13 @@ torch.backends.cudnn.benchmark   = False
 torch.use_deterministic_algorithms(True)
 
 yaml_config = "./models/cldm_v15.yaml"           # YAML configuration file
-# ckpt_path = '/hpc/dctrl/ks723/Huggingface_repos/ControlNet_repo/controlnet_repo/lightning_logs/version_25484631/checkpoints/epoch=4-step=51124.ckpt'
-ckpt_path='/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/lightning_logs/version_37726282/checkpoints/epoch=4-step=51124.ckpt'  # simtoexp
+
 # ------------------------------
 # 1. Load the Model from Checkpoint
 # ------------------------------
 config_yaml = OmegaConf.load(yaml_config)
 params = OmegaConf.to_container(config_yaml.model.params, resolve=True)
-model = ControlLDM.load_from_checkpoint(ckpt_path, **params)
-
-
-
+model = ControlLDM.load_from_checkpoint(CKPT_PATH_SEEDTOEXP, **params)
 
 model = model.cuda()
 

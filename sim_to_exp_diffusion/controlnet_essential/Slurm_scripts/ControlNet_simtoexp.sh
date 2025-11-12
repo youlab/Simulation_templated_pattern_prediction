@@ -1,8 +1,7 @@
 #!/bin/bash 
-#SBATCH -o slurm_ControlNet_simtoexp_20251015_%a.out
-#SBATCH -e slurm_ControlNet_simtoexp_20251015_%a.err
+#SBATCH -o slurm_ControlNet_simtoexp_20251111_%a.out
+#SBATCH -e slurm_ControlNet_simtoexp_20251111_%a.err
 #SBATCH -p youlab-gpu
-#SBATCH --array=1-5
 #SBATCH --exclusive
 #SBATCH --mem=24G
 #SBATCH --mail-type=ALL

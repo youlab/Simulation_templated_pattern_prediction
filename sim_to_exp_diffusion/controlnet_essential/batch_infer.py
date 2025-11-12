@@ -1,35 +1,25 @@
 import os, glob, cv2
 import pipeline
-from datetime import datetime
-import time
 from cldm.preprocess import preprocess_simulation_graybackground
 import argparse
-
+from cldm.config import OUTPUT_DIR_SIMTOEXP,SIM_FOLDER_TEST
 
 p = argparse.ArgumentParser()
 p.add_argument('--specific_folder', type=str, default='simtoexp')
 args = p.parse_args()
-model, sampler = pipeline.build(args.specific_folder)
+
 
 # ------------------------------
 # Set up output folder using current date/time
 # ------------------------------
 
-currentMinute = datetime.now().minute
-currentHour   = datetime.now().hour
-currentDay    = datetime.now().day
-currentMonth  = datetime.now().month
-currentYear   = datetime.now().year
-
-task_inference='simtoexp'
-
-OUTPUT_DIR = f"/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v{currentYear}{currentMonth}{currentDay}_{currentHour}{currentMinute}_{task_inference}"
+OUTPUT_DIR = OUTPUT_DIR_SIMTOEXP
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # ------------------------------
 # Parameters and File Paths 
 # ------------------------------
-INPUT_DIR      = "/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set"  # test images folder
+INPUT_DIR      = SIM_FOLDER_TEST  # test images folder
 
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -70,7 +60,7 @@ for prefix, fp in prefix_map.items():
     img= preprocess_simulation_graybackground(fp)
 
     # run the shared pipeline
-    outs = pipeline.process(model, sampler, img, **ARGS)
+    outs = pipeline.process(img, **ARGS)
 
     # save as prefix_1.png … prefix_5.png
     for i, out in enumerate(outs, start=1):

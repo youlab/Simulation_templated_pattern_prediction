@@ -1,6 +1,6 @@
 #!/bin/bash 
-#SBATCH -o slurm_ControlNet_seedtoexp_20251002.out
-#SBATCH -e slurm_ControlNet_seedtoexp_20251002.err
+#SBATCH -o slurm_ControlNet_seedtoexp_20251111.out
+#SBATCH -e slurm_ControlNet_seedtoexp_20251111.err
 #SBATCH -p youlab-gpu
 #SBATCH --exclusive
 #SBATCH --mem=24G
