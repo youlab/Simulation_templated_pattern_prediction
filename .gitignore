@@ -18,5 +18,5 @@ Dataset_upload.ipynb
 Readme_hfdataset.md
 /sim_to_exp_diffusion/controlnet_essential/inference_folders.tar
 /sim_to_exp_diffusion/controlnet_essential/inference_images.tar
-/sim_to_exp_diffusion/controlnet_essential/nohup.out
-
+/sim_to_exp_diffusion/controlnet_essential/contrastive_learning_v20251114_1234
+/sim_to_exp_diffusion/controlnet_essential/Dissimilarity_scoring.tar

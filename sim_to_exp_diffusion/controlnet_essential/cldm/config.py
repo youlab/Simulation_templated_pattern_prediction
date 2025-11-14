@@ -39,7 +39,7 @@ OUTPUT_DIR_SIMTOEXP = f"/hpc/dctrl/ks723/Physics_constrained_DL_pattern_predicti
 
 OUTPUT_DIR_RANDOMSEEDSWEEP = f"/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v{currentYear}{currentMonth}{currentDay}_{currentHour}{currentMinute}_random_seed_sweep/"
 OUTPUT_DIR_ABLATION_BASE= f"/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v{currentYear}{currentMonth}{currentDay}"
-
+OUTPUT_DIR_CONTRASTIVE_LEARNING=f"/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/contrastive_learning_v{currentYear}{currentMonth}{currentDay}_{currentHour}{currentMinute}/"
 
 # For ablation study 
 
