@@ -39,7 +39,7 @@ def preprocess_simulation(sim_path, top_crop=25, bottom_crop=25, left_crop=25, r
 def grayfordisplay(img_path, img_length=256, img_width=256, img_type='sim'):
 
     """
-    Preprocess single image Do 
+    Preprocess single image : 
     1. Invert colors, white to black and black to white
     2. Convert black to gray for better visualization
     3. Resize to desired dimensions
@@ -507,7 +507,7 @@ def preprocess_experimental_initialstage_mod(img_path, img_length=256, img_width
     Args:
         img_path: Input image path 
         img_length, img_width: Output dimensions
-        use_gentle: Use gentler segmentation for noisy images
+    
 
     Returns: PIL.Image: Color and Cropped image of Experimental data. Cropped exterior is a white masked circle. 
     """

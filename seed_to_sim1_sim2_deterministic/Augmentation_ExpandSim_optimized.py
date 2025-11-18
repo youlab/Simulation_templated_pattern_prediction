@@ -8,14 +8,6 @@ import os
 from utils.config import EXPERIMENTAL_FOLDER,SIMULATED_FOLDER
 
 
-# def rotate_image(img, angle, center=None, scale=1.0):
-#     (h, w) = img.shape[:2]
-#     if center is None:
-#         center = (w // 2, h // 2)
-#     M = cv2.getRotationMatrix2D(center, angle, scale)
-#     rotated = cv2.warpAffine(img, M, (w, h))
-#     return rotated
-
 def crop_and_rotate_experimental(img, angle):
     """Optimized experimental image rotation using OpenCV warpAffine.
     Steps:

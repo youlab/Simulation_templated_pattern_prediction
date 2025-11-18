@@ -8,130 +8,15 @@ import tempfile
 import os
     
 
-
-""" 
-This function processes raw experimental patterns and processes them in the desired color format
-
-"""
-
-def preprocess_experimental_initialstage_mod(img_path, img_length=256, img_width=256):
-
-    """
-    Preprocess single image in color from raw experimental data.
-
-    Args:
-        img_path: Input image path 
-        img_length, img_width: Output dimensions
-        use_gentle: Use gentler segmentation for noisy images
-
-    Returns: PIL.Image: Color and Cropped image of Experimental data. Cropped exterior is a white masked circle. 
-    """
-
-    img = cv2.imread(img_path)
-
-    # Convert the image to grayscale
-    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # Find edges in the image using Canny edge detection
-    edges = cv2.Canny(img_gray, 100, 200)
-
-    # Find circles in the image using HoughCircles method
-    circles = cv2.HoughCircles(edges, cv2.HOUGH_GRADIENT, dp=1, minDist=20,
-                            param1=50, param2=30, minRadius=20, maxRadius=600)
-
-    # Assuming the first detected circle is the plate (adjust accordingly)
-    if circles is not None:
-        circles = np.round(circles[0, :]).astype("int")
-        for (x_center, y_center, radius) in circles:
-            # Define a new radius for the mask that is 20 pixels smaller than the detected radius
-            new_radius = radius - 82
-
-            # Create a mask where all values are set to zeros (black)
-            mask = np.zeros((img.shape[0], img.shape[1]), dtype=np.uint8)   
-
-            # Draw a filled white circle on the mask where the new, smaller circle is
-            cv2.circle(mask, (x_center, y_center), new_radius, (255, 255, 255), -1)
-
-            # Apply the mask to the original image (set pixels outside the new circle to white)
-            img_masked = cv2.bitwise_and(img, img, mask=mask)
-
-            # Adjust contrast and brightness
-            alpha = 1.5  # Contrast control (1.0-3.0)
-            beta = 50    # Brightness control (0-100)
-            adjusted_image = cv2.convertScaleAbs(img_masked, alpha=alpha, beta=beta)
-
-
-            # Convert BGR to RGB for plotting
-            img_masked_rgb = cv2.cvtColor(adjusted_image, cv2.COLOR_BGR2RGB)
-
-            # resize both the adjusted image and the mask
-            img_resized = cv2.resize(img_masked_rgb, (img_length, img_width))
-            mask_resized = cv2.resize(mask,(img_length, img_width),interpolation=cv2.INTER_NEAREST)
-
-            # re-mask the resized image to force a black border outside the circle
-            img_masked_resized = cv2.bitwise_and(img_resized,img_resized,mask=mask_resized)
-
-            # Convert black border to white border (quick fix without changing bitwise operations)
-            # Create inverse mask for border areas
-            border_mask = mask_resized == 0
-            img_masked_resized[border_mask] = [255, 255, 255]  # Set border to white
-
-            return img_masked_resized
-
-    else:
-        print("No circles were found")
-        return None
-
-
-
 """Scale latents for visualization"""
 
 def scale_latents(latent):
-    # Normalize latent for visualization
+    """ Normalize latent for visualization """
     latent = latent - latent.min()
     latent = latent / latent.max()
     return latent
 
 
-def grayfordisplay(img_path, img_length=256, img_width=256, img_type='sim'):
-    """
-    Preprocess single image Do 
-    1. Invert colors, white to black and black to white
-    2. Convert black to gray for better visualization
-    3. Resize to desired dimensions
-
-    Args:
-        img_path: Input image path 
-        img_length, img_width: Output dimensions
-        use_gentle: Use gentler segmentation for noisy images
-    Returns: cv2 image: Processed image of Experimental data.
-
-    """
-    
-    img=cv2.imread(img_path, cv2.IMREAD_COLOR)
-    # convert to RGB
-    img=cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-    img_inverse = cv2.bitwise_not(np.array(img))
-    
-
-    # change artificial color to grey for visualization purposes
-    # RGB color code : (70,70,70)
-    img_inverse[np.all(img_inverse == [0,0,0], axis=-1)] = [152,152,152]
-
-    if img_type=='seed':
-        return img_inverse # for seed images, just invert and change black to gray resize causing weird artifacts
-
-    # remove the small border artifacts by adding a white border
-    # Set all channels including alpha to 255 for opaque white borders
-    img_inverse[0:2, :] = [255, 255, 255]
-    img_inverse[-2:, :] = [255, 255, 255]
-    img_inverse[:, 0:2] = [255, 255, 255]
-    img_inverse[:, -2:] = [255, 255, 255]
-
-    img_inverse = cv2.resize(img_inverse, (img_length, img_width))  # resize after doing operations
-
-    return img_inverse    
 
 def preprocess_simulation_output_data(img_path, start_index, end_index, img_filenames=None, top_crop=25, bottom_crop=25, left_crop=25, right_crop=25,  img_length=256, img_width=256):
     """
@@ -139,11 +24,11 @@ def preprocess_simulation_output_data(img_path, start_index, end_index, img_file
 
     Args:
         img_path: Input image path 
+        start_index, end_index: Specific indexes in the list of files to process
+        img_filenames: List of image filenames to process (optional)
         top_crop, bottom_crop, left_crop, right_crop: Number of pixels to crop from each side
-        start_index, end_index: Indices to crop the image array
-        path_img: Path to the folder containing images
         img_length, img_width: Output dimensions   
-    Returns: PIL.Image: Color and Cropped image of Simulation data. 
+    Returns: PIL.Image: Grayscale and Cropped image of Simulation data. 
     """
     count = 0
     output_data = []
@@ -192,15 +77,15 @@ def preprocess_simulation_output_data(img_path, start_index, end_index, img_file
 def preprocess_simulation_input_data(img_path, start_index, end_index,img_filenames=None, top_crop=0, bottom_crop=0, left_crop=3, right_crop=2):
     
     """
-    Preprocess and crops simulation input images in grayscale from raw simulation data.
+    Preprocess and crops input images in grayscale from seed of raw simulation data.
 
     Args:
         img_path: Input image path 
+        start_index, end_index: Specific indexes in the list of files to process
+        img_filenames: List of image filenames to process (optional)
         top_crop, bottom_crop, left_crop, right_crop: Number of pixels to crop from each side
-        start_index, end_index: Indices to crop the image array
-        path_img: Path to the folder containing images
         img_length, img_width: Output dimensions   
-    Returns: PIL.Image: Color and Cropped image of Simulation data. Cropped exterior is a white masked circle. 
+    Returns: PIL.Image: Grayscale and Cropped image of seed of simulation data. Cropped exterior is a white masked circle. 
     """
 
     # note: no resizing for input seed images, images are already img_length=32, img_width=32
@@ -222,7 +107,6 @@ def preprocess_simulation_input_data(img_path, start_index, end_index,img_filena
         new_width = img_array_i.shape[1] - (left_crop + right_crop)
         new_array_i = img_array_i[top_crop:top_crop+new_height, left_crop:left_crop+new_width]
 
-        # Skip OTSU thresholding for seed images - they're already binary
         (T, new_array_i) = cv2.threshold(new_array_i, 0, 255,cv2.THRESH_BINARY| cv2.THRESH_OTSU)
 
         # Convert images to gray on light background for better visualization
@@ -240,81 +124,6 @@ def preprocess_simulation_input_data(img_path, start_index, end_index,img_filena
             break
     return input_data
 
-def process_tensor_batch_with_grayfordisplay(tensor_batch, img_length=256, img_width=256, img_type='sim'):
-    """
-    Process a batch of torch tensors using grayfordisplay logic directly
-    
-    Args:
-        tensor_batch: torch.Tensor of shape (B, C, H, W) where C can be 1 or 3
-        img_length, img_width: Output dimensions
-        img_type: 'sim' or 'seed'
-    
-    Returns:
-        torch.Tensor: Processed images in same batch format as input (B, C, H, W)
-    """
-    batch_size, channels = tensor_batch.shape[0], tensor_batch.shape[1]
-    processed_images = []
-    
-    for i in range(batch_size):
-        # Extract single image from batch: (C, H, W)
-        single_tensor = tensor_batch[i].cpu().numpy()
-        
-        # Handle both 1-channel and 3-channel inputs
-        if channels == 1:
-            # Convert grayscale to RGB: (1, H, W) -> (H, W, 3)
-            img = single_tensor[0]  # Remove channel dimension
-            img = np.stack([img, img, img], axis=-1)  # Convert to 3-channel
-        else:
-            # Convert RGB: (3, H, W) -> (H, W, 3)
-            img = single_tensor.transpose(1, 2, 0)
-        
-        # Ensure proper data type and range
-        if img.max() <= 1.0:
-            img = (img * 255).astype(np.uint8)
-        else:
-            img = img.astype(np.uint8)
-        
-        # Apply grayfordisplay logic 
-     
-        # 1. Invert colors
-        img_inverse = cv2.bitwise_not(np.array(img))
-        
-        # 2. Change artificial color to gray for visualization
-        # 2.1 Extra thresholding step for predicted images to remove noise
-        img_inverse=cv2.threshold(img_inverse, 10, 255, cv2.THRESH_TOZERO)[1]
-        # 2.2 Change black to gray
-        img_inverse[np.all(img_inverse == [0,0,0], axis=-1)] = [152,152,152]
-        
-        if img_type != 'seed':
-            # 3. Remove border artifacts by adding white border
-            img_inverse[0:2, :] = [255, 255, 255]
-            img_inverse[-2:, :] = [255, 255, 255]
-            img_inverse[:, 0:2] = [255, 255, 255]
-            img_inverse[:, -2:] = [255, 255, 255]
-            
-            # 4. Resize after operations
-            img_inverse = cv2.resize(img_inverse, (img_length, img_width))
-        
-        # Convert back to tensor and normalize to [0, 1]
-        processed_tensor = torch.from_numpy(img_inverse.astype(np.float32) / 255.0)
-        
-        # Convert back to original format
-        if channels == 1:
-            # Convert back to grayscale: (H, W, 3) -> (1, H, W)
-            processed_tensor = processed_tensor.mean(dim=-1, keepdim=True).permute(2, 0, 1)
-        else:
-            # Convert back to RGB: (H, W, 3) -> (3, H, W)
-            processed_tensor = processed_tensor.permute(2, 0, 1)
-        
-        processed_images.append(processed_tensor)
-    
-    # Stack back into batch tensor
-    processed_batch = torch.stack(processed_images, dim=0)
-    
-    # Ensure same device as input
-    return processed_batch.to(tensor_batch.device)
-
-
 
 def load_sorted_filenames(file_path):
     with open(file_path, 'r') as file:
@@ -322,7 +131,6 @@ def load_sorted_filenames(file_path):
     return sorted_filenames
 
 
-# reads sorted filnames from a text file, to avoid alphanumeric sorting issues and avoid rotation data leakage
 def preprocess_experimental_output_data(path_i,start_index,end_index,img_filenames=None,top_crop=25,bottom_crop=25,left_crop=25,right_crop=25,img_length=256,img_width=256):
     """
     Preprocess experimental output images by cropping, resizing, and inverting colors.
@@ -524,7 +332,7 @@ def preprocess_experimental_backgroundwhite(exp_path,start_index, end_index, img
                                      img_length=256, img_width=256):
   
     """
-    Preprocess a list of images from the given path and return a PIL-compatible output.
+    Preprocess multiple images (crops, applies white background mask and resizes) from the given path and return a PIL-compatible output.
     
     Parameters:
         exp_path (str): Path to the experimental image file, assumes experimental image is already processed to exclude petri dish area and that area is black
@@ -536,7 +344,7 @@ def preprocess_experimental_backgroundwhite(exp_path,start_index, end_index, img
         img_width (int): Desired output image width.
         
     Returns:
-        Resized background white image as a numpy array converted to RGB.
+        Resized background white images as a list of numpy arrays converted to RGB.
     """
 
     count=0
@@ -591,10 +399,10 @@ def preprocess_experimental_backgroundwhite_rawfiles(exp_path,start_index, end_i
                                      img_length=256, img_width=256):
   
     """
-    Preprocess a single image from the given path and return a PIL-compatible output.
+    Preprocess raw experimental images from the given path and return a PIL-compatible output.
     
     Parameters:
-        exp_path (str): Path to the experimental image file, assumes experimental image is already processed to exclude petri dish area and that area is black
+        exp_path (str): Path to the experimental image file, assumes experimental image is raw file with petri dish area
         top_crop (int): Pixels to crop from the top.---------- 
         bottom_crop (int): Pixels to crop from the bottom.----All are kept 25 for experimental images 
         left_crop (int): Pixels to crop from the left.--------
@@ -603,7 +411,7 @@ def preprocess_experimental_backgroundwhite_rawfiles(exp_path,start_index, end_i
         img_width (int): Desired output image width.
         
     Returns:
-        Resized background white image as a numpy array converted to RGB.
+        Resized background white images as a list of numpy arrays converted to RGB.
     """
 
     count=0
@@ -701,4 +509,194 @@ def preprocess_experimental_backgroundwhite_rawfiles(exp_path,start_index, end_i
             break
 
     return output_data
+
+##################################
+
+# Extra preprocesssing functions not used in the current version of the paper but may be useful for future reference
+
+################################
+
+def preprocess_experimental_initialstage_mod(img_path, img_length=256, img_width=256):
+
+    """
+    Preprocess single image in color from raw experimental data.
+
+    Args:
+        img_path: Input image path 
+        img_length, img_width: Output dimensions
+        
+
+    Returns: PIL.Image: Color and Cropped image of Experimental data. Cropped exterior is a white masked circle. 
+    """
+
+    img = cv2.imread(img_path)
+
+    # Convert the image to grayscale
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Find edges in the image using Canny edge detection
+    edges = cv2.Canny(img_gray, 100, 200)
+
+    # Find circles in the image using HoughCircles method
+    circles = cv2.HoughCircles(edges, cv2.HOUGH_GRADIENT, dp=1, minDist=20,
+                            param1=50, param2=30, minRadius=20, maxRadius=600)
+
+    # Assuming the first detected circle is the plate (adjust accordingly)
+    if circles is not None:
+        circles = np.round(circles[0, :]).astype("int")
+        for (x_center, y_center, radius) in circles:
+            # Define a new radius for the mask that is 20 pixels smaller than the detected radius
+            new_radius = radius - 82
+
+            # Create a mask where all values are set to zeros (black)
+            mask = np.zeros((img.shape[0], img.shape[1]), dtype=np.uint8)   
+
+            # Draw a filled white circle on the mask where the new, smaller circle is
+            cv2.circle(mask, (x_center, y_center), new_radius, (255, 255, 255), -1)
+
+            # Apply the mask to the original image (set pixels outside the new circle to white)
+            img_masked = cv2.bitwise_and(img, img, mask=mask)
+
+            # Adjust contrast and brightness
+            alpha = 1.5  # Contrast control (1.0-3.0)
+            beta = 50    # Brightness control (0-100)
+            adjusted_image = cv2.convertScaleAbs(img_masked, alpha=alpha, beta=beta)
+
+
+            # Convert BGR to RGB for plotting
+            img_masked_rgb = cv2.cvtColor(adjusted_image, cv2.COLOR_BGR2RGB)
+
+            # resize both the adjusted image and the mask
+            img_resized = cv2.resize(img_masked_rgb, (img_length, img_width))
+            mask_resized = cv2.resize(mask,(img_length, img_width),interpolation=cv2.INTER_NEAREST)
+
+            # re-mask the resized image to force a black border outside the circle
+            img_masked_resized = cv2.bitwise_and(img_resized,img_resized,mask=mask_resized)
+
+            # Convert black border to white border (quick fix without changing bitwise operations)
+            # Create inverse mask for border areas
+            border_mask = mask_resized == 0
+            img_masked_resized[border_mask] = [255, 255, 255]  # Set border to white
+
+            return img_masked_resized
+
+    else:
+        print("No circles were found")
+        return None
+    
+    
+def grayfordisplay(img_path, img_length=256, img_width=256, img_type='sim'):
+    """
+    Preprocess single image 
+    1. Invert colors, white to black and black to white
+    2. Convert black to gray for better visualization
+    3. Resize to desired dimensions
+
+    Args:
+        img_path: Input image path 
+        img_length, img_width: Output dimensions
+        
+    Returns: cv2 image: Processed image of Experimental data.
+
+    """
+    
+    img=cv2.imread(img_path, cv2.IMREAD_COLOR)
+    # convert to RGB
+    img=cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    img_inverse = cv2.bitwise_not(np.array(img))
+    
+
+    # change artificial color to grey for visualization purposes
+    # RGB color code : (70,70,70)
+    img_inverse[np.all(img_inverse == [0,0,0], axis=-1)] = [152,152,152]
+
+    if img_type=='seed':
+        return img_inverse # for seed images, just invert and change black to gray resize causing weird artifacts
+
+    # remove the small border artifacts by adding a white border
+    # Set all channels including alpha to 255 for opaque white borders
+    img_inverse[0:2, :] = [255, 255, 255]
+    img_inverse[-2:, :] = [255, 255, 255]
+    img_inverse[:, 0:2] = [255, 255, 255]
+    img_inverse[:, -2:] = [255, 255, 255]
+
+    img_inverse = cv2.resize(img_inverse, (img_length, img_width))  # resize after doing operations
+
+    return img_inverse    
+
+def process_tensor_batch_with_grayfordisplay(tensor_batch, img_length=256, img_width=256, img_type='sim'):
+    """
+    Process a batch of torch tensors using grayfordisplay logic directly
+    
+    Args:
+        tensor_batch: torch.Tensor of shape (B, C, H, W) where C can be 1 or 3
+        img_length, img_width: Output dimensions
+        img_type: 'sim' or 'seed'
+    
+    Returns:
+        torch.Tensor: Processed images in same batch format as input (B, C, H, W)
+    """
+    batch_size, channels = tensor_batch.shape[0], tensor_batch.shape[1]
+    processed_images = []
+    
+    for i in range(batch_size):
+        # Extract single image from batch: (C, H, W)
+        single_tensor = tensor_batch[i].cpu().numpy()
+        
+        # Handle both 1-channel and 3-channel inputs
+        if channels == 1:
+            # Convert grayscale to RGB: (1, H, W) -> (H, W, 3)
+            img = single_tensor[0]  # Remove channel dimension
+            img = np.stack([img, img, img], axis=-1)  # Convert to 3-channel
+        else:
+            # Convert RGB: (3, H, W) -> (H, W, 3)
+            img = single_tensor.transpose(1, 2, 0)
+        
+        # Ensure proper data type and range
+        if img.max() <= 1.0:
+            img = (img * 255).astype(np.uint8)
+        else:
+            img = img.astype(np.uint8)
+        
+        # Apply grayfordisplay logic 
+     
+        # 1. Invert colors
+        img_inverse = cv2.bitwise_not(np.array(img))
+        
+        # 2. Change artificial color to gray for visualization
+        # 2.1 Extra thresholding step for predicted images to remove noise
+        img_inverse=cv2.threshold(img_inverse, 10, 255, cv2.THRESH_TOZERO)[1]
+        # 2.2 Change black to gray
+        img_inverse[np.all(img_inverse == [0,0,0], axis=-1)] = [152,152,152]
+        
+        if img_type != 'seed':
+            # 3. Remove border artifacts by adding white border
+            img_inverse[0:2, :] = [255, 255, 255]
+            img_inverse[-2:, :] = [255, 255, 255]
+            img_inverse[:, 0:2] = [255, 255, 255]
+            img_inverse[:, -2:] = [255, 255, 255]
+            
+            # 4. Resize after operations
+            img_inverse = cv2.resize(img_inverse, (img_length, img_width))
+        
+        # Convert back to tensor and normalize to [0, 1]
+        processed_tensor = torch.from_numpy(img_inverse.astype(np.float32) / 255.0)
+        
+        # Convert back to original format
+        if channels == 1:
+            # Convert back to grayscale: (H, W, 3) -> (1, H, W)
+            processed_tensor = processed_tensor.mean(dim=-1, keepdim=True).permute(2, 0, 1)
+        else:
+            # Convert back to RGB: (H, W, 3) -> (3, H, W)
+            processed_tensor = processed_tensor.permute(2, 0, 1)
+        
+        processed_images.append(processed_tensor)
+    
+    # Stack back into batch tensor
+    processed_batch = torch.stack(processed_images, dim=0)
+    
+    # Ensure same device as input
+    return processed_batch.to(tensor_batch.device)
+
 

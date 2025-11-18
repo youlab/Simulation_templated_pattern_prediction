@@ -32,9 +32,9 @@ dependencies:
   - brunsli=0.1=h2531618_0
   - bzip2=1.0.8=h7b6447c_0
   - c-ares=1.19.1=h5eee18b_0
-  - ca-certificates=2025.4.26=hbd8a1cb_0
+  - ca-certificates=2025.8.3=hbd8a1cb_0
   - cachecontrol=0.12.11=py310h06a4308_1
-  - certifi=2025.4.26=pyhd8ed1ab_0
+  - certifi=2025.8.3=pyhd8ed1ab_0
   - cffi=1.15.1=py310h5eee18b_3
   - cfitsio=3.470=h5893167_7
   - charls=2.2.0=h2531618_0
@@ -185,6 +185,7 @@ dependencies:
   - msgpack-python=1.0.3=py310hd09550d_0
   - munkres=1.1.4=py_0
   - narwhals=1.26.0=pyhd8ed1ab_0
+  - natsort=8.4.0=pyh29332c3_1
   - nbclient=0.5.13=py310h06a4308_0
   - nbconvert=6.5.4=py310h06a4308_0
   - nbformat=5.9.2=py310h06a4308_0
@@ -385,4 +386,3 @@ dependencies:
       - wrapt==1.16.0
       - xxhash==3.5.0
       - yarl==1.18.0
-

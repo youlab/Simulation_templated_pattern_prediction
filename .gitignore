@@ -3,6 +3,7 @@
 /seed_to_sim1_sim2_deterministic/non_essential
 /seed_to_sim1_sim2_deterministic/slurm_scripts/slurm_oe
 /seed_to_sim1_sim2_deterministic/slurm_oe
+/seed_to_sim1_sim2_deterministic/SSIM_SuppFig1.ipynb
 /sim_to_exp_diffusion/controlnet_essential/extra
 /sim_to_exp_diffusion/controlnet_essential/checkpoints
 /sim_to_exp_diffusion/controlnet_essential/controlnet_seedtoexp_controlnet_seedtoexp
@@ -20,3 +21,4 @@ Readme_hfdataset.md
 /sim_to_exp_diffusion/controlnet_essential/inference_images.tar
 /sim_to_exp_diffusion/controlnet_essential/contrastive_learning_v20251114_1234
 /sim_to_exp_diffusion/controlnet_essential/Dissimilarity_scoring.tar
+/sim_generation/non_essential

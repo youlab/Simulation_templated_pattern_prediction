@@ -4,7 +4,6 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 import numpy as np
-from diffusers import AutoencoderKL
 import pickle
 import json 
 from datetime import datetime
