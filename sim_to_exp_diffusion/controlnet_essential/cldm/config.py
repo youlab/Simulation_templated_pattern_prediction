@@ -15,22 +15,22 @@ FPATH = Path(mpl.get_data_path(), "/hpc/group/youlab/ks723/miniconda3/Lingchong/
 #########
 
 # For creating prompt.json files 
-BASE_FOLDER= '/hpc/group/youlab/ks723/storage'
+BASE_FOLDER= '/hpc/group/youlab/ks723/storage/'
 SPECIFIC_FOLDER_SIM='/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Selected_v4_ALL_100AUG' # Extract SimcorrtoExp.tar, run the augmentation script and use those images here
 SPECIFIC_FOLDER_EXP='/hpc/group/youlab/ks723/storage/Exp_images/Final_folder_uniform_fixedseed_100AUG' # Extract Exp.tar, run the augmentation script and use those images here
 SPECIFIC_FOLDER_SEED='/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Selected_v4_ALL_input_100AUG' # Extract Exp_SimcorrtoExp_seed.tar, run Seed_DataAugmentation.py script and use those images here
 
 # For Sim to Exp dataset, model training
-EXP_FOLDER_TRAIN_NONAUG='/hpc/group/youlab/ks723/storage/Exp_images/Final_folder_uniform_fixedseed'  # Exp.tar
+EXP_FOLDER_TRAIN_NONAUG='/hpc/group/youlab/ks723/storage/Exp_images/Final_folder_uniform_fixedseed/'  # Exp.tar
 
 # For Seed to Exp dataset, model training
 
 SEED_FOLDER_TRAIN_NONAUG="/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Selected_v4_ALL_input/"  # Exp_SimcorrtoExp_seed.tar
 
 # For running model inference # test images folder, v3 is the folder with 96 images- same number of images in experiment and simulation folders, used in the final analysis
-SIM_FOLDER_TEST   = "/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_v3"  # SimcorrtoExp_testset.tar
-SEED_FOLDER_TEST  = "/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_input_v3"  # Exp_SimcorrtoExp_testset_seed.tar
-EXP_FOLDER_TEST   = "/hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3/"  # Exp_testset.tar
+SIM_FOLDER_TEST   = "/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_v3/"  # SimcorrtoExp_testset.tar
+SEED_FOLDER_TEST  = "/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_input_v3/"  # Exp_SimcorrtoExp_testset_seed.tar
+EXP_FOLDER_TEST   = "/hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3/"  # Exp_testset.tar 
 
 
 # Creation of different folders that will be later used for inference outputs
@@ -45,16 +45,16 @@ OUTPUT_DIR_CONTRASTIVE_LEARNING=f"/hpc/dctrl/ks723/Physics_constrained_DL_patter
 
 MAIN_FOLDER= '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v2025926_1251_simtoexp_v3/'   # default ControlNet, OUTPUT_DIR_SIMTOEXP
 ABLATION_1=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_1458_no_guess/'  # Guess_mode= TRUE , Run ablation script and modify the part accordingly
-ABLATION_2=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_1753_no_negative' # n_prompt=""
-ABLATION_3=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_1756_plus_positive' # a_prompt="best quality, extremely detailed" # default ControlNet
-ABLATION_4=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_1758_low_strength_point85' # strength=0.85
-ABLATION_5=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_1758_high_strength_1point25' # strength=1.25
-ABLATION_6=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_1759_higher_DDIM_steps_100'  # ddim_steps=100
-ABLATION_7=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_181_lower_guidance_9point0'  # guidance_scale=9.0 # default ControlNet
+ABLATION_2=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_1753_no_negative/' # n_prompt=""
+ABLATION_3=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_1756_plus_positive/' # a_prompt="best quality, extremely detailed" # default ControlNet
+ABLATION_4=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_1758_low_strength_point85/' # strength=0.85
+ABLATION_5=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_1758_high_strength_1point25/' # strength=1.25
+ABLATION_6=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_1759_higher_DDIM_steps_100/'  # ddim_steps=100
+ABLATION_7=  '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251023_181_lower_guidance_9point0/'  # guidance_scale=9.0 # default ControlNet
 
 
 # For plotting Fig 5 (SUPP FIG 15)
-PRED_FOLDER_SEEDTOEXP = '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251011_841_seedtoexp_swapped_v3'  # OUTPUT_DIR_SEEDTOEXP
+PRED_FOLDER_SEEDTOEXP = '/hpc/dctrl/ks723/Physics_constrained_DL_pattern_prediction/sim_to_exp_diffusion/controlnet_essential/inference/v20251011_841_seedtoexp_swapped_v3/'  # OUTPUT_DIR_SEEDTOEXP
 
 # Checkpoint path for inference 
 
