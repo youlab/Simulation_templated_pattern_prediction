@@ -30,7 +30,7 @@ SEED_FOLDER_TRAIN_NONAUG="/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524
 # For running model inference # test images folder, v3 is the folder with 96 images- same number of images in experiment and simulation folders, used in the final analysis
 SIM_FOLDER_TEST   = "/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_v3/"  # SimcorrtoExp_testset.tar
 SEED_FOLDER_TEST  = "/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_031524/Final_Test_set_input_v3/"  # Exp_SimcorrtoExp_testset_seed.tar
-EXP_FOLDER_TEST   = "/hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3/"  # Exp_testset.tar 
+EXP_FOLDER_TEST   = "/hpc/group/youlab/ks723/storage/Exp_images/Final_Test_set_preprocess_v3/"   # Exp_testset.tar 
 
 
 # Creation of different folders that will be later used for inference outputs
