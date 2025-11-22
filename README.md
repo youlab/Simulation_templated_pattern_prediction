@@ -71,18 +71,22 @@ Contains the details of generating simulations with varying end-point patterns w
 
  [Updated 06 Nov 2025]: All the files that are needed to run the seed to simulation part(Simulation, experiment and seed images,also saved trained model files) are available in the public Huggingface datasets [here](https://huggingface.co/datasets/HotshotGoku/Physics_constrained_DL_pattern_prediction).
 
-    Steps to follow :
+    Steps to follow (for generating figures from paper/ running only the inference pipeline) :
 
     i) Download files from Huggingface datasets. Extract the tar files. 
 
     ii) Change the locations in the config files to whereever you stored these files. Note that there are 2 config files, for seed_to.... the file is located under utils folder and in the sim_to_exp... folder, the file is located under the cldm folder. 
 
-    iii) Run all the latent generation codes to save the pickle files. After these are done, you can go and update the locations in the config file under the utils folder. 
+    iii) Run the latent generation codes `latent_from_complex.py` and `Latent_from_final_patterns_intermediate.py` to save the pickle files. After these are done, you can go and update the locations in the config file under the utils folder. 
 
-    iv) You can now train the model (if you like) or you can run the prediction codes with the saved model files. To see basic prediction performance used in Figure 2,3 and 5 run the scripts: `Prediction_seedtointermediate_dilResNet_Fig2_SuppFig6.ipynb`, `Prediction_intermediatetocomplex_dilResNet_Fig3_SuppFig10.ipynb`, `batch_infer.py` and `plot_Fig5.ipynb` For figure 4 you have to run the augmentation code first. For training the models in the sim_to_exp_diffusion pipeline (Fig 5), it is imperative to run the augmentation script (`Augmentation_ExpandSim_optimized.py`) to generate ~40k patterns for experimental-simulation dataset from the base ~400 patterns. 
+    v) Run the prediction codes with the saved model files. To see basic prediction performance used in Figure 2,3 and 5 run the scripts: `Prediction_seedtointermediate_dilResNet_Fig2_SuppFig6.ipynb`, `Prediction_intermediatetocomplex_dilResNet_Fig3_SuppFig10.ipynb`, `batch_infer.py` and `plot_Fig5.ipynb` For figure 4, you can run `Prediction_datademand_intermediatetocomplex_Fig4.ipynb ` and `Prediction_datademand_augmentation_intermediatetocomplex_Fig4.ipynb`. 
 
-    v) The slurm scripts that were used to run the python files on the Duke computing cluster have been attached for reference. You can modify the gpu nodes and file locations accordingly. 
+    vi) The slurm scripts that were used to run the python files on the Duke computing cluster have been attached for reference. You can modify the gpu nodes and file locations accordingly. 
 
+    vii) (Optional) For training the models in the deterministic pipeline,you can work with what you have for Fig 2 and 3. For Fig 4, you would have to run the DataDemand_Augmentation.py code first, edit wherever your files are saved in the config file. Then run the `latent_complex_dataaugmentation.py` and `latent_intermediate_dataaugmentation.py`. Some of these files have a taskID in the code to run parallel jobs, if you do not have SLURM, replace these accordingly in the code. 
+    For training the models in the sim_to_exp_diffusion pipeline (Fig 5), it is imperative to run the Experimental+ Simulation augmentation script (`Augmentation_ExpandSim_optimized.py`) to generate ~40k patterns for experimental-simulation dataset from the base ~400 patterns. Change the locations in the config file. 
+    If you want to generate the Supplementary Figure 7 in the paper, you would have to run the Experimental+Simulation augmentation script from the point above first, then run `latent_from_Exp_images.py` and `latent_from_SimcorrtoExp_images.py`. Change the locations in the config file.
+     
 
 2) To run codes from the 2)sim to exp diffusion folder, you have to essentially install two large files. Firstly, you have to download the [Stable Diffusion v1-5 checkpoint](https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5/blob/main/v1-5-pruned.ckpt) 
 
@@ -112,35 +116,6 @@ Steps can be modified in the similar manner by running `tool_add_control_sd21.py
     conda env create -f pytorch_PA_patternprediction.yml
     ```
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

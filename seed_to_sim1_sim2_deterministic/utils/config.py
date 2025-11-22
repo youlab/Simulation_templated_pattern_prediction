@@ -64,9 +64,8 @@ SIMULATION_TEST_INPUT_FOLDER="/hpc/group/youlab/ks723/storage/MATLAB_SIMS/Sim_05
 # make simulation patterns output to latent dimension for training
 # note: Generate the latents first and save accordingly 
 
-LATENT_OUTPUT_FILE_SAVED= 'latent_dim_75000_4channels_4x32x32_gray_intermediate926.pickle' 
-LATENT_OUTPUT_SAVED=f'/hpc/group/youlab/ks723/miniconda3/Lingchong/Latents/{LATENT_OUTPUT_FILE_SAVED}'
-    
+LATENT_OUTPUT_FILE_SAVED= 'latent_dim_75000_4channels_4x32x32_gray_intermediate926.pickle'  # run the latent generation script, it will save the latents based on the naming scheme based on section #File creation of latents(topmost in this file), used the saved names (intermediate) here
+LATENT_OUTPUT_SAVED=f'/hpc/group/youlab/ks723/miniconda3/Lingchong/Latents/{LATENT_OUTPUT_FILE_SAVED}'  # replace with your folder location
 # Model save path
 MODEL_DILRESNET_FIG2_FILE='Pixel_32x32x3to32x32x4_dilRESNET_30k_graypatterns_seedtointermediate_v101_4-1759366230_best' # note no .pt extension
 MODEL_DILRESNET_FIG2=f'{MODEL_SAVE_LOCATION}/{MODEL_DILRESNET_FIG2_FILE}.pt'
@@ -88,8 +87,8 @@ SIMULATION_TEST_OUTPUT_FOLDER_TDB_2= '/hpc/group/youlab/ks723/storage/MATLAB_SIM
 MODEL_DILRESNET_FIG3_FILE= 'Pixel_32x32x3to32x32x4_dilRESNET_graypatterns_intermediatetocomplex_Model_30000_v102_9-1759430803' # note no .pt extension
 MODEL_DILRESNET_FIG3=f'/hpc/group/youlab/ks723/miniconda3/saved_models/trained/{MODEL_DILRESNET_FIG3_FILE}.pt'
 
-LATENT_OUTPUT_TDB_FILE_SAVED= 'latent_dim_75000_4channels_4x32x32_gray_complex926.pickle' 
-LATENT_OUTPUT_TDB_SAVED=f'/hpc/group/youlab/ks723/miniconda3/Lingchong/Latents/{LATENT_OUTPUT_TDB_FILE_SAVED}'
+LATENT_OUTPUT_TDB_FILE_SAVED= 'latent_dim_75000_4channels_4x32x32_gray_complex926.pickle' # run the latent generation script, it will save the latents based on the naming scheme based on section #File creation of latents(topmost in this file), used the saved names (complex) here
+LATENT_OUTPUT_TDB_SAVED=f'/hpc/group/youlab/ks723/miniconda3/Lingchong/Latents/{LATENT_OUTPUT_TDB_FILE_SAVED}'   # replace with your folder location
 
 
 ##############
