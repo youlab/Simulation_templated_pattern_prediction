@@ -85,7 +85,7 @@ Contains the details of generating simulations with varying end-point patterns w
 
     vi) (Optional) For training the models in the deterministic pipeline,you can work with what you have for Fig 2 and 3. For Fig 4, you would have to run the DataDemand_Augmentation.py code first, edit wherever your files are saved in the config file. Then run the `latent_complex_dataaugmentation.py` and `latent_intermediate_dataaugmentation.py`. Some of these files have a taskID in the code to run parallel jobs, if you do not have SLURM, replace these accordingly in the code. 
     For training the models in the sim_to_exp_diffusion pipeline (Fig 5), it is imperative to run the Experimental+ Simulation augmentation script (`Augmentation_ExpandSim_optimized.py`) to generate ~40k patterns for experimental-simulation dataset from the base ~400 patterns. Change the locations in the config file. 
-    If you want to generate the Supplementary Figure 7 in the paper, you would have to run the Experimental+Simulation augmentation script from the point above first, then run `latent_from_Exp_images.py` and `latent_from_SimcorrtoExp_images.py`. Change the locations in the config file.
+    If you want to generate the Supplementary Figure 12 in the paper, you would have to run the Experimental+Simulation augmentation script from the point above first, then run `latent_from_Exp_images.py` and `latent_from_SimcorrtoExp_images.py`. Change the locations in the config file.
      
 
 2) To run codes from the 2)sim to exp diffusion folder, you have to essentially install two large files. Firstly, you have to download the [Stable Diffusion v1-5 checkpoint](https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5/blob/main/v1-5-pruned.ckpt) 
