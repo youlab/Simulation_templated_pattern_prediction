@@ -33,7 +33,7 @@ LOGS_SAVE_LOCATION= '/hpc/group/youlab/ks723/miniconda3/saved_models/logs'
 #########
 # Font for plots
 
-FPATH = Path(mpl.get_data_path(), "/hpc/group/youlab/ks723/miniconda3/Lingchong/fonts/ARIAL.TTF")
+FPATH = Path(mpl.get_data_path(), "/hpc/group/youlab/ks723/miniconda3/Lingchong/fonts/ARIAL.TTF") # ARIAL.TTF
 #########
 
 ################
