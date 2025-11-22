@@ -26,8 +26,8 @@ LATENT_OUTPUT_SIMCORRTOEXP= f'/hpc/group/youlab/ks723/miniconda3/Lingchong/Laten
 ############
 # I save all the models and logs here and load in the scripts accordingly
 ############
-MODEL_SAVE_LOCATION='/hpc/group/youlab/ks723/miniconda3/saved_models/trained/'
-LOGS_SAVE_LOCATION= '/hpc/group/youlab/ks723/miniconda3/saved_models/logs'
+MODEL_SAVE_LOCATION='/hpc/group/youlab/ks723/miniconda3/saved_models/trained/'  # download the seed_to_sim_deterministic models and save them in a folder and put the path here
+LOGS_SAVE_LOCATION= '/hpc/group/youlab/ks723/miniconda3/saved_models/logs' # download the seed_to_sim_deterministic logs, save them in a folder and put the path here
 
 
 #########
