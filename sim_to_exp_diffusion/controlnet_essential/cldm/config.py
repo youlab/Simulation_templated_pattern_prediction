@@ -11,7 +11,7 @@ currentYear   = datetime.now().year
 
 #########
 # Font for plots
-FPATH = Path(mpl.get_data_path(), "/hpc/group/youlab/ks723/miniconda3/Lingchong/fonts/ARIAL.TTF")
+FPATH = Path(mpl.get_data_path(), "/hpc/group/youlab/ks723/miniconda3/Lingchong/fonts/ARIAL.TTF")  # ARIAL.TTF
 #########
 
 # For creating prompt.json files 
