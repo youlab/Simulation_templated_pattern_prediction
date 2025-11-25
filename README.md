@@ -30,91 +30,92 @@ Overall code structure
 ```
 Physics_constrained_DL_pattern_prediction/
 │
-├── seed_to_sim1_sim2_deterministic/         # 
-│   ├── latent_generation/                   # Save latents from end-point patterns as pickle files
+├── seed_to_sim1_sim2_deterministic/          
+│   ├── latent_generation/                              # Save latents from end-point patterns as pickle files
 │   │   ├── Latent_from_final_patterns_intermediate.py  # default patterns (Fig 2,3,4) 
-│   │   ├── latent_complex_dataaugmentation.py # Thinner but denser branches on augmented dataset (Fig 4)
-│   │   ├── latent_from_Exp_images.py        # Experimental patterns (Supp Fig 12)
-│   │   ├── latent_from_SimcorrtoExp_images.py  # Experimental patterns (Supp Fig 12)
-│   │   ├── latent_from_complex.py           # Thinner but denser branches (Fig 3,4)
-│   │   └── latent_intermediate_dataaugmentation.py  # default patterns on augmented dataset (Fig 4)
+│   │   ├── latent_complex_dataaugmentation.py          # Thinner but denser branches on augmented dataset (Fig 4)
+│   │   ├── latent_from_Exp_images.py                   # Experimental patterns (Supp Fig 12)
+│   │   ├── latent_from_SimcorrtoExp_images.py          # Experimental patterns (Supp Fig 12)
+│   │   ├── latent_from_complex.py                      # Thinner but denser branches (Fig 3,4)
+│   │   └── latent_intermediate_dataaugmentation.py     # default patterns on augmented dataset (Fig 4)
 │   │
-│   ├── models/                              # 
+│   ├── models/                              
 │   │   ├── dilResNet.py                     # dilated ResNet implementation(Fig 2,3,4)
 │   │   └── vae.py                           # SD VAE v 1-5
 │   │
 │   ├── slurm_scripts/                       # Running python jobs on DCC 
 │   │
-│   ├── utils/                               # 
+│   ├── utils/                               
 │   │   ├── config.py                        # Physical locations of files generated and imported
 │   │   ├── display.py                       # Display functions 
 │   │   └── preprocess.py                    # Preprocess functions
 │   │
-│   ├── Augmentation_ExpandSim.py            # Data augmentation for experiments and corresponding simulations (Fig 5)
-│   ├── Augmentation_ExpandSim_optimized.py  # Optimized version of data augmentation for experiments and corresponding simulations (Fig 5)
-│   ├── DataDemand_Augmentation.py           # Augmentation for dataset with smaller unique samples (Fig 4)
-│   ├── Display_seed_sim_exp_Fig1.ipynb      # Out of box accuracy for SDVAE, seed+sim+exp comparision
-│   ├── Image_grids_SuppFig2_3_4_8_9_13_14.ipynb  # 10x10 image grids seed, default, TDB and exp patterns and corresponding latents 
-│   ├── Image_preprocessing_Expimages.ipynb  # Data preprocessing + augmentation example (Supp Fig 11 )
-│   ├── Prediction_datademand_augmentation_intermediatetocomplex_Fig4.ipynb  # Inference: Data demand assessment with augmented datasets 
-│   ├── Prediction_datademand_intermediatetocomplex_Fig4.ipynb  # Inference: Data demand assessment 
-│   ├── Prediction_intermediatetocomplex_dilResNet_Fig3_SuppFig10.ipynb  # Inference: Default sim to TDB sim 
+│   ├── Augmentation_ExpandSim.py                                           # Data augmentation for experiments and corresponding simulations (Fig 5)
+│   ├── Augmentation_ExpandSim_optimized.py                                 # Optimized version of data augmentation for experiments and corresponding simulations (Fig 5)
+│   ├── DataDemand_Augmentation.py                                          # Augmentation for dataset with smaller unique samples (Fig 4)
+│   ├── Display_seed_sim_exp_Fig1.ipynb                                     # Out of box accuracy for SDVAE, seed+sim+exp comparision
+│   ├── Image_grids_SuppFig2_3_4_8_9_13_14.ipynb                            # 10x10 image grids seed, default, TDB and exp patterns and corresponding latents 
+│   ├── Image_preprocessing_Expimages.ipynb                                 # Data preprocessing + augmentation example (Supp Fig 11 )
+│   ├── Prediction_datademand_augmentation_intermediatetocomplex_Fig4.ipynb # Inference: Data demand assessment with augmented datasets 
+│   ├── Prediction_datademand_intermediatetocomplex_Fig4.ipynb              # Inference: Data demand assessment 
+│   ├── Prediction_intermediatetocomplex_dilResNet_Fig3_SuppFig10.ipynb     # Inference: Default sim to TDB sim 
 │   ├── Prediction_seedtointermediate_dilResNet_CPUbenchmark_SuppInf.ipynb  # Speed Benchmark for inference for ResNet vs simulations 
-│   ├── Prediction_seedtointermediate_dilResNet_Fig2_SuppFig6.ipynb  # Inference: Seed to default simulations 
-│   ├── Prediction_simtoexp_dilResNet_SuppFig12.ipynb  # Inference: Simulation to experiments
-│   ├── SSIM_ExpandSim_SuppFig1.ipynb        # SSIM metric on reconstructed sim and exp
-│   ├── Scatterplot_SSIM_seedvariation_SuppFig7.ipynb  # SSIM vs seeding number
-│   ├── Training_datademand_intermediatetocomplex.py  # Training: Data demand assessment 
-│   ├── Training_datademand_inttocomplex_augmentation.py  # Training: Data demand assessment with augmented datasets
-│   ├── Training_intermediatetocomplex_dilResNets.py  # Training: Default to TDB sim 
-│   ├── Training_seedtointermediate_dilRESNETs.py  # Training: Seed to default simulations 
-│   └── Training_simtoexp_dilResNets.py      # Training: Sim to Exp
+│   ├── Prediction_seedtointermediate_dilResNet_Fig2_SuppFig6.ipynb         # Inference: Seed to default simulations 
+│   ├── Prediction_simtoexp_dilResNet_SuppFig12.ipynb                       # Inference: Simulation to experiments
+│   ├── SSIM_ExpandSim_SuppFig1.ipynb                                       # SSIM metric on reconstructed sim and exp
+│   ├── Scatterplot_SSIM_seedvariation_SuppFig7.ipynb                       # SSIM vs seeding number
+│   ├── Training_datademand_intermediatetocomplex.py                        # Training: Data demand assessment 
+│   ├── Training_datademand_inttocomplex_augmentation.py                    # Training: Data demand assessment with augmented datasets
+│   ├── Training_intermediatetocomplex_dilResNets.py                        # Training: Default to TDB sim 
+│   ├── Training_seedtointermediate_dilRESNETs.py                           # Training: Seed to default simulations 
+│   └── Training_simtoexp_dilResNets.py                                     # Training: Sim to Exp
 │
-├── sim_generation/                          # 
-│   ├── Slurm_scripts/                       # Running MATLAB jobs on DCC
-│   ├── Branching_diffusion.m                # Function for branching, unchanged from MSB 2021
-│   ├── ExptoSim_MAT.m                       # Convert fixed experimental seeding to corresponding simulation seeding 
-│   ├── Img_design.m                         # Design fixed seeding test set for deterministic pipeline
-│   ├── Optimal_Patterns_3Tp2Cond_ModelTesting.m  # Generate simulations for test set for default and TDB patterns 
-│   ├── Optimal_Patterns_3Tp2Cond_vmod.m     # Generate simulations for train set for default and TDB patterns  
-│   ├── Optimal_Patterns_ExperimentalCondns.m  # Generate simulations corresponding to experimental training/test set (random configs)
+├── sim_generation/                          
+│   ├── Slurm_scripts/                                   # Running MATLAB jobs on DCC
+│   ├── Branching_diffusion.m                            # Function for branching, unchanged from MSB 2021
+│   ├── ExptoSim_MAT.m                                   # Convert fixed experimental seeding to corresponding simulation seeding 
+│   ├── Img_design.m                                     # Design fixed seeding test set for deterministic pipeline
+│   ├── Optimal_Patterns_3Tp2Cond_ModelTesting.m         # Generate simulations for test set for default and TDB patterns 
+│   ├── Optimal_Patterns_3Tp2Cond_vmod.m                 # Generate simulations for train set for default and TDB patterns  
+│   ├── Optimal_Patterns_ExperimentalCondns.m            # Generate simulations corresponding to experimental training/test set (random configs)
 │   ├── Optimal_Patterns_ExperimentalCondns_Fixedgrid.m  # Generate simulations corresponding to experimental training set (fixed config)
-│   ├── Parameters_multiseeding.mat          # Parameters for multiseeding, unchanged from MSB 2021
-│   ├── Patterns_generator_experimental.m    # Generate 1000 random seeding configs for exp
-│   ├── SimulatedGridMATgeneration.m         # Convert random experimental seeding to corresponding simulation seeding 
-│   ├── designs_24_10_02.mat                 # Saved predefined grids from Img_design.m
-│   ├── simulatedPatterns.mat                # Simulated seeding grids from SimulatedGridMATgeneration.m
-│   └── simulatedPatterns_Fixed.mat          # Simulated seeding grids from ExptoSim_MAT.m
+│   ├── Parameters_multiseeding.mat                      # Parameters for multiseeding, unchanged from MSB 2021
+│   ├── Patterns_generator_experimental.m                # Generate 1000 random seeding configs for exp
+│   ├── SimulatedGridMATgeneration.m                     # Convert random experimental seeding to corresponding simulation seeding 
+│   ├── designs_24_10_02.mat                             # Saved predefined grids from Img_design.m
+│   ├── simulatedPatterns.mat                            # Simulated seeding grids from SimulatedGridMATgeneration.m
+│   └── simulatedPatterns_Fixed.mat                      # Simulated seeding grids from ExptoSim_MAT.m
 │
-├── sim_to_exp_diffusion/                    # 
-│   └── controlnet_essential/                # (following files were changed from original ControlNet)
-│       ├── cldm/                            # 
-│       │   ├── config.py                    # Physical locations of files generated and imported
-│       │   ├── logger_custom.py             # Generate unique subdir to save train images
-│       │   └── preprocess.py                # Preprocess functions
-│       ├── Slurm_scripts/                   # Running python jobs on DCC
+├── sim_to_exp_diffusion/                    
+│   └── controlnet_essential/                       # (following files were changed from original ControlNet)
+│       ├── cldm/                           
+│       │   ├── config.py                           # Physical locations of files generated and imported
+│       │   ├── logger_custom.py                    # Generate unique subdir to save train images
+│       │   └── preprocess.py                       # Preprocess functions
+│       ├── Slurm_scripts/                          # Running python jobs on DCC
 │       │
-│       ├── batch_infer.py                   # Inference: Test set
-│       ├── batch_infer_ablation.py          # Inference: Parameter variation
-│       ├── batch_infer_seedsweep.py         # Inference: Diffusion model starting random noise change
-│       ├── batch_infer_seedtoexp.py         # Inference: Test set, seed to exp
-│       ├── create_promptjson.ipynb          # source, target and hint(blank test) for training model
-│       ├── DissimilarityScore_Seeding.ipynb # Siamese network to calculate dissimilarity (Supp Fig 17,18)
-│       ├── inference_gradio.ipynb           # Web interface for running inference
+│       ├── batch_infer.py                          # Inference: Test set
+│       ├── batch_infer_ablation.py                 # Inference: Parameter variation
+│       ├── batch_infer_seedsweep.py                # Inference: Diffusion model starting random noise change
+│       ├── batch_infer_seedtoexp.py                # Inference: Test set, seed to exp
+│       ├── create_promptjson.ipynb                 # source, target and hint(blank test) for training model
+│       ├── DissimilarityScore_Seeding.ipynb        # Siamese network to calculate dissimilarity (Supp Fig 17,18)
+│       ├── inference_gradio.ipynb                  # Web interface for running inference
 │       ├── inference_quantmetrics_seedtoexp.ipynb  # SSIM, LPIPS, ORB for seed to exp (Supp Table)
 │       ├── inference_quantmetrics_simtoexp.ipynb   # SSIM, LPIPS, ORB (default) (Supp Table)
-│       ├── pipeline.py                      # Inference: Sampling
-│       ├── pipeline_seedtoexp.py            # Inference: Sampling seed to exp
-│       ├── plot_Fig5.ipynb                  # Plot Fig 5 + Supp Fig 15 
-│       ├── plot_suppfig_ablation.ipynb      # Plot Supp Fig 16
-│       ├── Seed_DataAugmentation.py         # Create augmented set with rotations of seeding configurations (corresponding to Exps)
-│       ├── seedtoexp_dataset.py             # Training: Dataset creation seed to exp
-│       ├── seedtoexp_train.py               # Training: seed to exp
-│       ├── simtoexp_dataset.py              # Training: Dataset creation default
-│       └──simtoexp_train.py                # Training: default
+│       ├── pipeline.py                             # Inference: Sampling
+│       ├── pipeline_seedtoexp.py                   # Inference: Sampling seed to exp
+│       ├── plot_Fig5.ipynb                         # Plot Fig 5 + Supp Fig 15 
+│       ├── plot_suppfig_ablation.ipynb             # Plot Supp Fig 16
+│       ├── Seed_DataAugmentation.py                # Create augmented set with rotations of seeding configurations (corresponding to Exps)
+│       ├── seedtoexp_dataset.py                    # Training: Dataset creation seed to exp
+│       ├── seedtoexp_train.py                      # Training: seed to exp
+│       ├── simtoexp_dataset.py                     # Training: Dataset creation default
+│       └──simtoexp_train.py                        # Training: default
 │
 ├── pytorch_PA_patternprediction.yml         # conda virutal environment file 
 └── README.md                                # you are reading this
+
 
 ```
 
