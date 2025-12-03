@@ -22,3 +22,5 @@ Readme_hfdataset.md
 /sim_to_exp_diffusion/controlnet_essential/contrastive_learning_v20251114_1234
 /sim_to_exp_diffusion/controlnet_essential/Dissimilarity_scoring.tar
 /sim_generation/non_essential
+/figure_outputs
+/setup_data.ipynb
