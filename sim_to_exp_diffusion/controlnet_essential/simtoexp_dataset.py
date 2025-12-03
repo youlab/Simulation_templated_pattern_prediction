@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 from cldm.preprocess import preprocess_experimental_backgroundwhite,preprocess_simulation_graybackground
 from cldm.config import BASE_FOLDER,SPECIFIC_FOLDER_SIM, SPECIFIC_FOLDER_EXP
 
-base_folder=BASE_FOLDER
+base_folder=BASE_FOLDER  # place prompt_simtoexp.json at this location from hf datasets
 base_folder_i=SPECIFIC_FOLDER_SIM
 base_folder_o=SPECIFIC_FOLDER_EXP
 

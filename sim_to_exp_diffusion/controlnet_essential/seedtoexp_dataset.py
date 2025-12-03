@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 from cldm.preprocess import preprocess_experimental_backgroundwhite,preprocess_seed_graybackground
 from cldm.config import BASE_FOLDER, SPECIFIC_FOLDER_SEED, SPECIFIC_FOLDER_EXP
 
-base_folder=BASE_FOLDER
+base_folder=BASE_FOLDER # place prompt_seedtoexp.json at this location from hf datasets
 base_folder_o=SPECIFIC_FOLDER_EXP
 base_folder_i=SPECIFIC_FOLDER_SEED
 
