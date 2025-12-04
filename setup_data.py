@@ -53,7 +53,7 @@ def download_datasets():
     print("This may take a while (~19GB)...")
     
     snapshot_download(
-        repo_id="HotshotGoku/Physics_constrained_DL_pattern_prediction",
+        repo_id="HotshotGoku/Simulation_templated_pattern_prediction",
         repo_type="dataset",
         local_dir=DATA_DIR
     )
