@@ -77,7 +77,7 @@ Steps can be modified in the similar manner by running `tool_add_control_sd21.py
 Overall code structure
 
 ```
-Physics_constrained_DL_pattern_prediction/
+Simulation_templated_pattern_prediction/
 │
 ├── seed_to_sim1_sim2_deterministic/          
 │   ├── latent_generation/                              # Save latents from end-point patterns as pickle files
