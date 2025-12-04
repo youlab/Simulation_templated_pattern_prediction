@@ -1,7 +1,7 @@
-# Physics_constrained_DL_pattern_prediction
+# Simulation_templated_pattern_prediction
 ![Maintenance](https://img.shields.io/badge/maintenance-active-brightgreen)
 
-For the manuscript:  Physics constrained photorealistic prediction of self-organized P. aeruginosa patterns by Kinshuk Sahu, Harris M. Davis, Jia Lu, César A. Villalobos, Avi Heyman, Emrah Şimşek and Lingchong You
+For the manuscript:  Simulation-templated, photorealistic prediction of self-organized bacterial patterns using a foundational image model by Kinshuk Sahu, Harris M. Davis, Jia Lu, César A. Villalobos, Avi Heyman, Emrah Şimşek and Lingchong You
 
 See Notes section at the end for information about execution of these various scripts. 
 
