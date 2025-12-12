@@ -218,8 +218,8 @@ def setup_controlnet():
     
     # Define paths
     controlnet_dir = REPO_DIR / "sim_to_exp_diffusion" / "controlnet_essential"
-    sd_checkpoint_path = controlnet_dir / "models" / "v1-5-pruned.ckpt"
-    controlnet_ini_path = controlnet_dir / "models" / "control_sd15_ini.pth"
+    sd_checkpoint_path = controlnet_dir / "v1-5-pruned.ckpt"
+    controlnet_ini_path = controlnet_dir / "control_sd15_ini.pth"
     tool_script = controlnet_dir / "tool_add_control.py"
     
     # Download Stable Diffusion checkpoint if not exists
