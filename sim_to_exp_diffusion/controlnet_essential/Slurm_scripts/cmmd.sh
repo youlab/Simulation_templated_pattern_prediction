@@ -6,7 +6,7 @@
 #SBATCH --mem=24G
 #SBATCH --mail-type=ALL
 source activate pytorch_PA_patternprediction
-cd /hpc/dctrl/ks723/cmmd
+cd /hpc/dctrl/ks723/cmmd # git clone from https://github.com/sayakpaul/cmmd-pytorch
 # Folder pairs
 declare -A comparisons
 comparisons["exp_vs_sim"]=" /hpc/group/youlab/ks723/storage/Processed_testsets/exp /hpc/group/youlab/ks723/storage/Processed_testsets/sim"
