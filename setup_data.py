@@ -39,6 +39,13 @@ from config_automate import DATA_DIR
 
 DATA_DIR = str(DATA_DIR)  # Convert to string for compatibility
 
+# Redirect HuggingFace cache to DATA_DIR to avoid filling up home directory
+HF_CACHE_DIR = os.path.join(DATA_DIR, ".huggingface_cache")
+os.makedirs(HF_CACHE_DIR, exist_ok=True)
+os.environ["HF_HOME"] = HF_CACHE_DIR
+os.environ["HUGGINGFACE_HUB_CACHE"] = HF_CACHE_DIR
+os.environ["TRANSFORMERS_CACHE"] = HF_CACHE_DIR
+
 # ==============================================================================
 # Step 1: Download Datasets from HuggingFace
 # ==============================================================================
@@ -278,11 +285,7 @@ def main():
     print("  3. Generate VAE latents (~43 min per dataset, GPU recommended)")
     print("  4. Download SD checkpoint and attach ControlNet (~5 min)")
     print("\nTotal estimated time: ~2-3 hours")
-    
-    response = input("\nContinue? (y/n): ")
-    if response.lower() != 'y':
-        print("Setup cancelled.")
-        return
+    print("\nStarting setup process...\n")
     
     try:
         # Step 1: Download datasets
