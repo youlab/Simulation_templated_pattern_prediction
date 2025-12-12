@@ -1,3 +1,5 @@
+/sim_to_exp_diffusion/controlnet_essential/models/control_sd15_ini.pth
+/sim_to_exp_diffusion/controlnet_essential/models/v1-5-pruned.ckpt
 /sim_to_exp_diffusion/controlnet_essential/control_sd15_ini.ckpt
 /sim_to_exp_diffusion/controlnet_essential/v1-5-pruned.ckpt
 /seed_to_sim1_sim2_deterministic/non_essential
@@ -20,7 +22,11 @@ Readme_hfdataset.md
 /sim_to_exp_diffusion/controlnet_essential/inference_folders.tar
 /sim_to_exp_diffusion/controlnet_essential/inference_images.tar
 /sim_to_exp_diffusion/controlnet_essential/contrastive_learning_v20251114_1234
+/sim_to_exp_diffusion/controlnet_essential/contrastive_learning_v20251210_1658
 /sim_to_exp_diffusion/controlnet_essential/Dissimilarity_scoring.tar
 /sim_generation/non_essential
 /figure_outputs
 /setup_data.ipynb
+/nohup.out
+/slurm_setup_data_40468402.out
+/slurm_setup_data_40468402.err
